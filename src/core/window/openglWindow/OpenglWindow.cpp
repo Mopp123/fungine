@@ -1,5 +1,5 @@
 
-#include <glew.h>
+#include <GLEW/glew.h>
 #include "OpenglWindow.h"
 #include "core/Common.h"
 #include "core/Debug.h"

@@ -41,21 +41,17 @@ namespace fungine
 
 			class Renderer : public Component
 			{
-			private:
-				
-				static std::vector<entities::Entity*> s_entities; // Entities this same renderer has been attached to
-				static unsigned int s_processedEntities;
-				static RenderPass s_renderPass;
+			protected:
 
-				static bool s_isReadyToFlush;
+				std::vector<entities::Entity*> _entities; // Entities this renderer has been attached to
+				RenderPass _renderPass;
 
 				static graphics::Framebuffer* s_framebuffer; // *->TEMP : just testing framebuffer here..
 
 			public:
-
 				Renderer();
 				virtual ~Renderer();
-
+				
 				virtual void onAttackToEntity(entities::Entity* entity) override;
 				virtual void update() override;
 
@@ -64,9 +60,9 @@ namespace fungine
 
 				virtual const size_t getSize() const override;
 
-			private:
+			protected:
 				virtual void submit(entities::Entity* entity);
-				static void clear();
+				void clear();
 			};
 		}
 	}

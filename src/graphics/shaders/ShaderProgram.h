@@ -41,11 +41,17 @@ namespace fungine
 			);
 
 			virtual int getUniformLocation(const std::string& uniformName) = 0;
+			
 			virtual void setUniform(int location, int val) const = 0;
+			virtual void setUniform(int location, const mml::IVector2&) const = 0;
+			virtual void setUniform(int location, const mml::IVector3&) const = 0;
+			virtual void setUniform(int location, const mml::IVector4&) const = 0;
+
 			virtual void setUniform(int location, float val) const = 0;
 			virtual void setUniform(int location, const mml::Vector2& vec) const = 0;
 			virtual void setUniform(int location, const mml::Vector3& vec) const = 0;
 			virtual void setUniform(int location, const mml::Vector4& vec) const = 0;
+			
 			virtual void setUniform(int location, const mml::Matrix4& m) const = 0;
 
 			virtual void setUniform(const std::string& location, int val) = 0;

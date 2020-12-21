@@ -1,5 +1,5 @@
 
-#include <glew.h>
+#include <GLEW/glew.h>
 #include "OpenglFramebuffer.h"
 #include "OpenglRendererCommands.h"
 #include "core/Debug.h"

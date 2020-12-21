@@ -1,6 +1,7 @@
 
 #include "Material.h"
 #include "entities/Entity.h"
+#include "components/rendering/Camera.h"
 #include "core/Debug.h"
 
 namespace fungine
@@ -18,12 +19,12 @@ namespace fungine
 
 		Material::Material(
 			graphics::ShaderProgram* shader,
-			const std::vector<ShaderUniform<mml::Matrix4>>& uniforms,
 			const std::vector<graphics::Texture*>& textures,
 			entities::Entity* entity
 		) :
 			Component(entity)
 		{
+			_shader = shader;
 			for (int i = 0; i < textures.size(); ++i)
 			{
 				if (i >= MATERIAL__MAX_TEXTURES)
@@ -45,11 +46,72 @@ namespace fungine
 			}
 		}
 
+		Material::Material(
+			graphics::ShaderProgram* shader,
+			const std::vector<std::pair<std::string, graphics::Texture*>>& textures,
+			entities::Entity* entity
+		) :
+			Component(entity)
+		{
+			_shader = shader;
+			for (int i = 0; i < textures.size(); ++i)
+			{
+				if (i >= MATERIAL__MAX_TEXTURES)
+				{
+#ifdef DEBUG__MODE_FULL
+					Debug::log(
+						"Location: Material::Material(\n"
+						"graphics::ShaderProgram * shader,\n"
+						"const std::vector<std::pair<std::string, Texture*>>&textures,\n"
+						"const std::vector<graphics::ShaderUniform<mml::Matrix4>>&uniforms\n"
+						")\n"
+						"Attempted to create Material with too many Textures. Current Material Texture limit is: " + std::to_string(MATERIAL__MAX_TEXTURES),
+						DEBUG__ERROR_LEVEL__ERROR
+					);
+#endif
+					break;
+				}
+				// Attempt to set all shader's texture uniforms
+				if (_shader)
+				{
+					_shader->bind();
+					for (int i = 0; i < textures.size(); ++i)
+					{
+						const std::pair<std::string, Texture*>& t = textures[i];
+						_textures[i] = t.second;
+						_shader->setUniform(_shader->getUniformLocation(t.first), i);
+					}
+					_shader->unbind();
+				}
+			}
+		}
+
 		Material::~Material()
 		{
 			Debug::notify_on_destroy("Material");
 		}
 
+		template void Material::addUniform<int>(graphics::ShaderUniform<int>& uniform);
+		template void Material::addUniform<mml::IVector2>(graphics::ShaderUniform<mml::IVector2>& uniform);
+		template void Material::addUniform<mml::IVector3>(graphics::ShaderUniform<mml::IVector3>& uniform);
+		template void Material::addUniform<mml::IVector4>(graphics::ShaderUniform<mml::IVector4>& uniform);
+
+		template void Material::addUniform<float>(graphics::ShaderUniform<float>& uniform);
+		template void Material::addUniform<mml::Vector2>(graphics::ShaderUniform<mml::Vector2>& uniform);
+		template void Material::addUniform<mml::Vector3>(graphics::ShaderUniform<mml::Vector3>& uniform);
+		template void Material::addUniform<mml::Vector4>(graphics::ShaderUniform<mml::Vector4>& uniform);
+
+		template void Material::addUniform<mml::Matrix4>(graphics::ShaderUniform<mml::Matrix4>& uniform);
+
+		template<typename T>
+		void Material::addUniform(graphics::ShaderUniform<T>& uniform)
+		{
+			uniform._location = _shader->getUniformLocation(uniform.getName());
+			_shader->bind();
+			_shader->setUniform(uniform.getLocation(), *uniform.getData());
+			_uniformList.add(uniform);
+			_shader->unbind();
+		}
 		
 		bool operator==(const Material& left, const Material& right)
 		{
@@ -118,13 +180,20 @@ namespace fungine
 #endif
 		}
 
-		std::shared_ptr<Material> Material::create_material(
-			ShaderProgram* shader,
-			const std::vector<ShaderUniform<mml::Matrix4>>& uniforms,
-			const std::vector<Texture*>& textures
+		std::shared_ptr<Material> Material::create_material__default3D(
+			graphics::ShaderProgram* shader,
+			const std::vector<graphics::Texture*>& textures
 		)
 		{
-			return std::make_shared<Material>(shader, uniforms, textures);
+			return std::make_shared<Material>(shader, textures);
+		}
+
+		std::shared_ptr<Material> Material::create_material__default3D(
+			graphics::ShaderProgram* shader,
+			const std::vector<std::pair<std::string, graphics::Texture*>>& textures
+		)
+		{
+			return std::make_shared<Material>(shader, textures);
 		}
 	}
 }

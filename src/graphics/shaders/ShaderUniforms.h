@@ -57,5 +57,32 @@ namespace fungine
 
 			inline const T* const getData() const { return _data; }
 		};
+
+		struct ShaderUniformList
+		{
+			std::vector<ShaderUniform<int>> uniforms_int;
+			std::vector<ShaderUniform<mml::IVector2>> uniforms_int2;
+			std::vector<ShaderUniform<mml::IVector3>> uniforms_int3;
+			std::vector<ShaderUniform<mml::IVector4>> uniforms_int4;
+
+			std::vector<ShaderUniform<float>> uniforms_float;
+			std::vector<ShaderUniform<mml::Vector2>> uniforms_float2;
+			std::vector<ShaderUniform<mml::Vector3>> uniforms_float3;
+			std::vector<ShaderUniform<mml::Vector4>> uniforms_float4;
+
+			std::vector<ShaderUniform<mml::Matrix4>> uniforms_matrix4;
+
+			void add(const ShaderUniform<int>& uniform) { uniforms_int.push_back(uniform); }
+			void add(const ShaderUniform<mml::IVector2>& uniform) { uniforms_int2.push_back(uniform); }
+			void add(const ShaderUniform<mml::IVector3>& uniform) { uniforms_int3.push_back(uniform); }
+			void add(const ShaderUniform<mml::IVector4>& uniform) { uniforms_int4.push_back(uniform); }
+
+			void add(const ShaderUniform<float>& uniform) {uniforms_float.push_back(uniform); }
+			void add(const ShaderUniform<mml::Vector2>& uniform) { uniforms_float2.push_back(uniform); }
+			void add(const ShaderUniform<mml::Vector3>& uniform) { uniforms_float3.push_back(uniform); }
+			void add(const ShaderUniform<mml::Vector4>& uniform) { uniforms_float4.push_back(uniform); }
+		
+			void add(const ShaderUniform<mml::Matrix4>& uniform) { uniforms_matrix4.push_back(uniform); }
+		};
 	}
 }

@@ -4,13 +4,16 @@
 #include "graphics/Texture.h"
 #include "graphics/shaders/ShaderProgram.h"
 #include "graphics/shaders/ShaderUniforms.h"
+#include <utility>
+#include <string>
 
 #include <memory>
 
-#define MATERIAL__MAX_TEXTURES	4
+#define MATERIAL__MAX_TEXTURES	16
 
 namespace fungine
 {
+	
 	namespace components
 	{
 		class Material : public Component
@@ -19,6 +22,8 @@ namespace fungine
 
 			graphics::Texture* _textures[MATERIAL__MAX_TEXTURES] = { nullptr };
 			graphics::ShaderProgram* _shader = nullptr;
+			
+			graphics::ShaderUniformList _uniformList;
 
 			float _specular_strength =	0.0f;
 			float _specular_shininess = 0.0f;
@@ -34,19 +39,30 @@ namespace fungine
 
 			Material(
 				graphics::ShaderProgram* shader,
-				const std::vector<graphics::ShaderUniform<mml::Matrix4>>& uniforms = {},
 				const std::vector<graphics::Texture*>& textures = {},
 				entities::Entity * entity = nullptr
 			);
+			// With this you can specify the texture's name in shader
+			Material(
+				graphics::ShaderProgram* shader,
+				const std::vector<std::pair<std::string, graphics::Texture*>>& textures = {},
+				entities::Entity* entity = nullptr
+			);
 			~Material();
+
+			template<typename T>
+			void addUniform(graphics::ShaderUniform<T>& uniform);
 
 			void setTexture(unsigned int textureSlot, graphics::Texture* texture);
 			const graphics::Texture* getTexture(unsigned int textureSlot) const;
 
-			static std::shared_ptr<Material> create_material(
+			static std::shared_ptr<Material> create_material__default3D(
 				graphics::ShaderProgram* shader,
-				const std::vector<graphics::ShaderUniform<mml::Matrix4>>& uniforms = {},
 				const std::vector<graphics::Texture*>& textures = {}
+			);
+			static std::shared_ptr<Material> create_material__default3D(
+				graphics::ShaderProgram* shader,
+				const std::vector<std::pair<std::string, graphics::Texture*>>& textures = {}
 			);
 
 			inline void setSpecular_strength(float val)			{ _specular_strength = val; }
@@ -55,12 +71,13 @@ namespace fungine
 			inline void setHasNormalMap(bool arg)				{ _hasNormalMap = arg; }
 			inline void setShader(graphics::ShaderProgram* shader) { _shader = shader; }
 			
-			inline float getSpecular_strength() const				{ return _specular_strength; }
-			inline float getSpecular_shininess() const				{ return _specular_shininess; }
-			inline bool hasSpecularMap() const						{ return _hasSpecularMap; }
-			inline bool hasNormalMap()								{ return _hasNormalMap; }
-			inline graphics::ShaderProgram* getShader()				{ return _shader; }
-			
+			inline float getSpecular_strength() const					{ return _specular_strength; }
+			inline float getSpecular_shininess() const					{ return _specular_shininess; }
+			inline bool hasSpecularMap() const							{ return _hasSpecularMap; }
+			inline bool hasNormalMap()									{ return _hasNormalMap; }
+			inline graphics::ShaderProgram* getShader()					{ return _shader; }
+			inline const graphics::ShaderUniformList& getUniformList()	{ return _uniformList; }
+
 			friend bool operator==(const Material& left, const Material& right);
 			friend bool operator!=(const Material& left, const Material& right);
 

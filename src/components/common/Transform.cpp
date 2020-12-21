@@ -21,6 +21,8 @@ namespace fungine
 			setPosition(pos);
 			setRotation(rot);
 			setScale(scale);
+
+			update();
 		}
 
 		Transform::~Transform()
@@ -92,7 +94,17 @@ namespace fungine
 		}
 		mml::Vector3 Transform::getScale() const
 		{
-			return { 1,1,1 };
+			mml::Matrix4 m = _transformationMatrix;
+			// Extract translation completely away
+			m[0 + 3 * 4] = 0.0f;
+			m[1 + 3 * 4] = 0.0f;
+			m[2 + 3 * 4] = 0.0f;
+
+			// Attempt to negate the scale
+			float sx = (mml::Vector3(m[0 + 0 * 4], m[1 + 0 * 4], m[2 + 0 * 4]).magnitude());
+			float sy = (mml::Vector3(m[0 + 1 * 4], m[1 + 1 * 4], m[2 + 1 * 4]).magnitude());
+			float sz = (mml::Vector3(m[0 + 2 * 4], m[1 + 2 * 4], m[2 + 2 * 4]).magnitude());
+			return { sx,sy,sz };
 		}
 
 		mml::Vector3 Transform::right() const

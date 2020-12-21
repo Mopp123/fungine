@@ -1,10 +1,12 @@
 
-#include "Renderer.h"
+#include "TerrainRenderer.h"
 #include "core/window/Window.h"
 #include "graphics/Graphics.h"
 #include "graphics/RendererCommands.h"
+
 #include "components/rendering/Camera.h"
 #include "components/rendering/lighting/Lights.h"
+
 #include "core/Debug.h"
 
 namespace fungine
@@ -17,93 +19,33 @@ namespace fungine
 		namespace rendering
 		{
 
-			void RenderQue::add(std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material)
-			{
-				// If you can find already existing batch for this mesh/material combo -> add it to that batch
-				if (_batches.find(material) != _batches.end())
-				{
-					std::vector<std::shared_ptr<Mesh>>& batch = _batches[material];
-				#ifdef DEBUG__MODE_FULL
-					if (batch.empty())
-					{
-						Debug::log(
-							"Location: void RenderQue::add(const Mesh* mesh, const Material* material)\n"
-							"Triend to add mesh to an already existing batch, but the batch was empty!\n"
-							"If there is a batch there should always be at least 1 mesh in its' render que.",
-							DEBUG__ERROR_LEVEL__ERROR
-						);
-						return;
-					}
-				#endif
-					add_to_dynamic_list(batch, mesh);
-				}
-				else // If we cannot find already existing batch for
-				{
-					std::vector<std::shared_ptr<Mesh>> newBatch;
-					add_to_dynamic_list(newBatch, mesh);
-					_batches.insert(std::make_pair(material, newBatch));
-				}
-			}
-
-			void RenderQue::clear()
-			{
-				_batches.clear();
-			}
-
-
-			
-			Framebuffer* Renderer::s_framebuffer = nullptr;
-
-			Renderer::Renderer() :
-				Component(nullptr)
+			TerrainRenderer::TerrainRenderer()
 			{
 				if (!s_framebuffer)
 					s_framebuffer = Framebuffer::create_framebuffer(core::Window::get_width(), core::Window::get_height(), true);
 			}
 
-			Renderer::~Renderer()
+			TerrainRenderer::~TerrainRenderer()
 			{}
 
-			void Renderer::onAttackToEntity(entities::Entity* entity)
-			{
-				add_to_dynamic_list(_entities, entity);
-			}
-
-			void Renderer::update()
-			{
-				for (Entity* e : _entities)
-					submit(e);
-
-				flush();
-			}
-
-			void Renderer::submit(entities::Entity* entity)
-			{
-				std::shared_ptr<Mesh> mesh = entity->getComponent<Mesh>();
-				std::shared_ptr<Material> material = entity->getComponent<Material>();
-				if(mesh && material)
-					_renderPass.renderQue.add(mesh, material);
-			}
-
-
-			void Renderer::flush()
+			void TerrainRenderer::flush()
 			{
 				const RendererCommands* rendererCommands = Graphics::get_renderer_commands();
 				Camera* camera = Camera::get_current_camera();
 				DirectionalLight* directionalLight = DirectionalLight::get_directional_light();
 
-			#ifdef DEBUG__MODE_FULL
+#ifdef DEBUG__MODE_FULL
 				if (!camera)
 				{
 					Debug::log(
-						"Location: void Renderer::flush()\n"
+						"Location: void TerrainRenderer::flush()"
 						"Tried to flush renderer, but the current camera was nullptr!",
 						DEBUG__ERROR_LEVEL__ERROR
 					);
 					clear();
 					return;
 				}
-			#endif
+#endif
 
 
 				// * for each render pass in the future
@@ -115,15 +57,6 @@ namespace fungine
 					ShaderProgram* shader = material->getShader();
 
 					rendererCommands->bindMaterial(material);
-
-					// "bind texture units"
-					shader->setUniform("texture_diffuse", 0);
-
-					if (material->hasSpecularMap())
-						shader->setUniform("texture_specular", 1);
-
-					if (material->hasNormalMap())
-						shader->setUniform("texture_normal", 2);
 
 					// common uniforms
 					shader->setUniform("projectionMatrix", camera->getProjectionMatrix());
@@ -155,12 +88,7 @@ namespace fungine
 				clear();
 			}
 
-			void Renderer::clear()
-			{
-				_renderPass.renderQue.clear();
-			}
-
-			const size_t Renderer::getSize() const
+			const size_t TerrainRenderer::getSize() const
 			{
 				return sizeof(*this);
 			}

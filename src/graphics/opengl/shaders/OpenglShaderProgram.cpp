@@ -1,5 +1,5 @@
 
-#include <glew.h>
+#include <GLEW/glew.h>
 #include "OpenglShaderProgram.h"
 #include "core/Debug.h"
 #include "core/Common.h"
@@ -113,6 +113,18 @@ namespace fungine
 			void OpenglShaderProgram::setUniform(int location, int val) const
 			{
 				GL_FUNC(glUniform1i(location, val));
+			}
+			void OpenglShaderProgram::setUniform(int location, const mml::IVector2& val) const
+			{
+				GL_FUNC(glUniform2i(location, val.x, val.y));
+			}
+			void OpenglShaderProgram::setUniform(int location, const mml::IVector3& val) const
+			{
+				GL_FUNC(glUniform3i(location, val.x, val.y, val.z));
+			}
+			void OpenglShaderProgram::setUniform(int location, const mml::IVector4& val) const
+			{
+				GL_FUNC(glUniform4i(location, val.x, val.y, val.z, val.w));
 			}
 			void OpenglShaderProgram::setUniform(int location, float val) const
 			{

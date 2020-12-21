@@ -1,5 +1,5 @@
 
-#include <glew.h>
+#include <GLEW/glew.h>
 #include "OpenglRendererCommands.h"
 #include "OpenglTexture.h"
 #include "core/Debug.h"
@@ -22,6 +22,15 @@ namespace fungine
 			) :
 				Texture(imgData)
 			{
+				// force using format the image data has..
+				switch (imgData->getChannels())
+				{
+				case 1: internalFormat = (format = TextureFormat::Red); break;
+				case 3: internalFormat = (format = TextureFormat::RGB); break;
+				case 4: internalFormat = (format = TextureFormat::RGBA); break;
+				default:break;
+				}
+
 				// *allow creating opengl texture without any pixel data as well
 				byte* pixelData = nullptr;
 				if (imgData)

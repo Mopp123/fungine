@@ -2,6 +2,7 @@
 
 #include "window/Window.h"
 #include "graphics/Graphics.h"
+#include <string>
 
 namespace fungine
 {
@@ -17,7 +18,7 @@ namespace fungine
 
 		public:
 
-			Program();
+			Program(const std::string& windowTitle, int windowWidth, int windowHeight);
 			~Program();
 			bool isCloseRequested() const;
 

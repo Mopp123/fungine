@@ -1,6 +1,7 @@
 
 #include "Program.h"
 #include "Common.h"
+#include "utils/Time.h"
 #include "Debug.h"
 
 #include <assert.h>
@@ -14,10 +15,10 @@ namespace fungine
 
 		std::unique_ptr<Window> Program::_window = nullptr;
 
-		Program::Program()
+		Program::Program(const std::string& windowTitle, int windowWidth, int windowHeight)
 		{
 			graphics::Graphics::set_graphics_api(graphics::GraphicsAPI::OpenGL);
-			_window = Window::create_window("Opengl testing", DEFAULT__WINDOW_WIDTH, DEFAULT__WINDOW_HEIGHT, 0, 1);
+			_window = Window::create_window(windowTitle.c_str(), windowWidth, windowHeight, 1, 1);
 			
 			// This is fucking retarded..
 			_window->createInputMapping();
@@ -48,6 +49,7 @@ namespace fungine
 
 			_window->swapBuffers();
 			_window->updateEvents();
+			Time::update();
 		}
 	}
 }

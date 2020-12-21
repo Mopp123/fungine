@@ -17,11 +17,14 @@ namespace fungine
 			TextureFiltering texFilteringMode_min, TextureFiltering texFilteringMode_mag
 		)
 		{
+			unsigned int w = width > 0 ? width : imgData->getWidth();
+			unsigned int h = height > 0 ? height : imgData->getHeight();
+
 			switch (Graphics::get_graphics_api())
 			{
 			case GraphicsAPI::OpenGL: return new opengl::OpenglTexture(
 				imgData,
-				width, height, samples,
+				w, h, samples,
 				internalFormat,
 				format,
 				texDataType,

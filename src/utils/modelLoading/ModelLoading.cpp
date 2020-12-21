@@ -55,6 +55,8 @@ namespace fungine
 				const bool hasTangents = loadTangents && assimpMesh->HasTangentsAndBitangents();
 				const bool hasBones = loadBones && assimpMesh->HasBones();
 
+				std::string meshName = assimpMesh->mName.C_Str();
+
 				// Basic vertex data
 				std::vector<float> vertexData;
 				std::vector<unsigned int> indices;
@@ -87,7 +89,7 @@ namespace fungine
 				// Then all custom shit.. instanced buffers, skinning stuff.. etc, depending on what kind of mesh this is..
 				if (!hasBones)
 				{
-					return Mesh::create_mesh({ vertexBuffer }, indexBuffer, DrawType::Triangles);
+					return Mesh::create_mesh({ vertexBuffer }, indexBuffer, DrawType::Triangles, meshName);
 				}
 #ifndef DISABLE_SKINNED_MESH_LOADING
 				else if (hasBones)
@@ -213,6 +215,10 @@ namespace fungine
 				return texture;
 			}
 
+
+			// just quick fix so the same material cannot get loaded multiple times..
+			static std::vector<std::string> g_s_loaded_materials; // *->TEMP
+
 			// Creates material according to the aiMesh's material
 			// Loads the material's textures specified by the aiMesh's material
 			// *NOTE Currently we can have only one diffuse, specular and normal texture (no possibility of texture blending at the moment..)
@@ -231,6 +237,13 @@ namespace fungine
 				const unsigned int materialIndex = assimpMesh->mMaterialIndex;
 				aiMaterial* assimpMaterial = assimpScene->mMaterials[materialIndex];
 
+				// Make sure we don't load the same material multiple times
+				std::string materialName = assimpMaterial->GetName().C_Str();
+				if (std::find(g_s_loaded_materials.begin(), g_s_loaded_materials.end(), materialName) != g_s_loaded_materials.end())
+					return;
+				else
+					g_s_loaded_materials.push_back(materialName);
+
 				// *These are pairs, since we need a handle to the texture's image data created on the heap, 
 				// to be able to refer to it and destroy it later as well.
 				(*diffuseTexture) =	load_material_texture(assimpMaterial, aiTextureType_DIFFUSE);
@@ -239,11 +252,8 @@ namespace fungine
 				if (!(*normalTexture)) // apparently some file formats has the normal map as "heightmap".. dunno.. just in case.. this propably fucks up at some point..
 					(*normalTexture) = load_material_texture(assimpMaterial, aiTextureType_HEIGHT);
 
-				
-				std::string materialName = assimpMaterial->GetName().C_Str(); // Later we may care about this.. for graphical editors 'n shit..
-				outMaterial = Material::create_material(
+				outMaterial = Material::create_material__default3D(
 					nullptr,
-					{},
 					{ *diffuseTexture, *specularTexture, *normalTexture }
 				);
 
@@ -320,6 +330,7 @@ namespace fungine
 				for (int i = 0; i < assimpNode->mNumMeshes; i++)
 				{
 					aiMesh* assimpMesh = assimpScene->mMeshes[assimpNode->mMeshes[i]];
+					
 					std::shared_ptr<Material> material = nullptr;
 
 					if (loadMaterial)
@@ -335,11 +346,11 @@ namespace fungine
 							&normalTexture
 						);
 
-						outTextures.push_back(diffuseTexture);
-						outTextures.push_back(specularTexture);
-						outTextures.push_back(normalTexture);
+						if (diffuseTexture)		outTextures.push_back(diffuseTexture);
+						if (specularTexture)	outTextures.push_back(specularTexture);
+						if (normalTexture)		outTextures.push_back(normalTexture);
 
-						outMaterials.push_back(material);
+						if (material) outMaterials.push_back(material);
 					}
 
 					outMeshes.push_back(convert_assimp_mesh(assimpScene, assimpMesh, 0, loadTangents, assimpMesh->HasBones()));
@@ -364,7 +375,6 @@ namespace fungine
 
 				return outFlags;
 			}
-
 
 			void load_model(
 				const std::string& path,
@@ -418,6 +428,8 @@ namespace fungine
 					outMaterials
 				);
 				//assimpImporter.FreeScene(); // unnecessary, because its called by Importer's destructor?
+
+				g_s_loaded_materials.clear();
 			}
 		}
 	}

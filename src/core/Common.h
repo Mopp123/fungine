@@ -20,4 +20,4 @@
 // Macros ---------------------------------------	Macros
 
 // Helps us to detect if we accidentally add something to a list indefinately
-#define add_to_dynamic_list(list, x) list.push_back(x); printf("*Increased dynamic list size. Current list length: %d\n", list.size());
+#define add_to_dynamic_list(list, x) list.push_back(x); /*printf("*Increased dynamic list size. Current list length: %d\n", list.size());*/

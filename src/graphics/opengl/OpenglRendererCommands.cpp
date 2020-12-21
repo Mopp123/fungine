@@ -1,5 +1,5 @@
 
-#include <glew.h>
+#include <GLEW/glew.h>
 #include "OpenglRendererCommands.h"
 #include "core/Debug.h"
 
@@ -23,6 +23,8 @@ namespace fungine
 				// *TEMPORARY -> move this somewhere else in the future..
 				GL_FUNC(glEnable(GL_DEPTH_TEST));
 				GL_FUNC(glEnable(GL_MULTISAMPLE));
+				glEnable(GL_BLEND);
+				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 				GL_FUNC(glClearColor(_clearColor.x, _clearColor.y, _clearColor.z, _clearColor.w));
 				GL_FUNC(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 			}
@@ -62,6 +64,13 @@ namespace fungine
 				GL_FUNC(glDrawElementsInstanced(openglDrawType, mesh->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, NULL, mesh->getInstanceCount()));
 			}
 
+
+			template<typename T>
+			static void send_uniform_list_to_shader(const std::vector<ShaderUniform<T>>& list, ShaderProgram* shader)
+			{
+				for (const ShaderUniform<T>& u : list) shader->setUniform(u.getLocation(), *u.getData());
+			}
+
 			void OpenglRendererCommands::bindMaterial(Material* const material) const
 			{
 				// bind shader
@@ -83,6 +92,20 @@ namespace fungine
 						}
 					}
 				}
+
+				// Send all material's uniforms
+				const ShaderUniformList& uniformList = material->getUniformList();
+				send_uniform_list_to_shader<int>(uniformList.uniforms_int, shader);
+				send_uniform_list_to_shader<mml::IVector2>(uniformList.uniforms_int2, shader);
+				send_uniform_list_to_shader<mml::IVector3>(uniformList.uniforms_int3, shader);
+				send_uniform_list_to_shader<mml::IVector4>(uniformList.uniforms_int4, shader);
+				
+				send_uniform_list_to_shader<float>(uniformList.uniforms_float, shader);
+				send_uniform_list_to_shader<mml::Vector2>(uniformList.uniforms_float2, shader);
+				send_uniform_list_to_shader<mml::Vector3>(uniformList.uniforms_float3, shader);
+				send_uniform_list_to_shader<mml::Vector4>(uniformList.uniforms_float4, shader);
+
+				send_uniform_list_to_shader<mml::Matrix4>(uniformList.uniforms_matrix4, shader);
 			}
 			void OpenglRendererCommands::unbindMaterial(const Material* const material) const
 			{

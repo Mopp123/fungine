@@ -1,5 +1,5 @@
 
-#include <glew.h>
+#include <GLEW/glew.h>
 #include "OpenglMesh.h"
 #include "graphics/Buffers.h"
 #include "OpenglBuffers.h"
@@ -13,8 +13,8 @@ namespace fungine
 		namespace opengl
 		{
 
-			OpenglMesh::OpenglMesh(std::vector<VertexBuffer*> vertexBuffers, IndexBuffer* indexBuffer, DrawType drawType) :
-				Mesh(vertexBuffers, indexBuffer, drawType)
+			OpenglMesh::OpenglMesh(std::vector<VertexBuffer*> vertexBuffers, IndexBuffer* indexBuffer, DrawType drawType, const std::string& name) :
+				Mesh(vertexBuffers, indexBuffer, drawType, name)
 			{
 				GL_FUNC(glGenVertexArrays(1, &_vaoID));
 

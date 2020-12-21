@@ -35,7 +35,12 @@ namespace fungine
 				~OpenglShaderProgram();
 
 				virtual int getUniformLocation(const std::string& uniformName) override;
+				
 				virtual void setUniform(int location, int val) const override;
+				virtual void setUniform(int location, const mml::IVector2&) const override;
+				virtual void setUniform(int location, const mml::IVector3&) const override;
+				virtual void setUniform(int location, const mml::IVector4&) const override;
+
 				virtual void setUniform(int location, float val) const override;
 				virtual void setUniform(int location, const mml::Vector2& vec) const override;
 				virtual void setUniform(int location, const mml::Vector3& vec) const override;

@@ -56,7 +56,7 @@ namespace fungine
 			virtual ~Texture() {}
 
 			static Texture* create_texture(
-				const ImageData* imgData, unsigned int width, unsigned int height, int samples = 1,
+				const ImageData* imgData, unsigned int width = 0, unsigned int height = 0, int samples = 1,
 				TextureFormat internalFormat = TextureFormat::RGB,
 				TextureFormat format = TextureFormat::RGB,
 				TextureDataType texDataType = TextureDataType::UnsignedByte,

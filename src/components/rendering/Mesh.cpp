@@ -15,8 +15,8 @@ namespace fungine
 	namespace components
 	{
 
-		Mesh::Mesh(std::vector<VertexBuffer*> vertexBuffers, IndexBuffer* indexBuffer, DrawType drawType, entities::Entity* entity) :
-			Component(entity), _vertexBuffers(vertexBuffers), _indexBuffer(indexBuffer), _drawType(drawType)
+		Mesh::Mesh(std::vector<VertexBuffer*> vertexBuffers, IndexBuffer* indexBuffer, DrawType drawType, const std::string& name, entities::Entity* entity) :
+			Component(entity), _name(name), _vertexBuffers(vertexBuffers), _indexBuffer(indexBuffer), _drawType(drawType)
 		{}
 
 		Mesh::~Mesh()
@@ -33,14 +33,14 @@ namespace fungine
 		}
 
 
-		std::shared_ptr<Mesh> Mesh::create_mesh(std::vector<VertexBuffer*> vertexBuffers, IndexBuffer* indexBuffer, DrawType drawType)
+		std::shared_ptr<Mesh> Mesh::create_mesh(std::vector<VertexBuffer*> vertexBuffers, IndexBuffer* indexBuffer, DrawType drawType, const std::string& name)
 		{
 			switch (Graphics::get_graphics_api())
 			{
-			case GraphicsAPI::OpenGL: return std::make_shared<opengl::OpenglMesh>(vertexBuffers, indexBuffer, drawType);
+			case GraphicsAPI::OpenGL: return std::make_shared<opengl::OpenglMesh>(vertexBuffers, indexBuffer, drawType, name);
 			default:
 				Debug::log(
-					"Mesh* Mesh::create_mesh(std::vector<VertexBuffer*> vertexBuffers, IndexBuffer* indexBuffer)\n"
+					"Location: Mesh* Mesh::create_mesh(std::vector<VertexBuffer*> vertexBuffers, IndexBuffer* indexBuffer)\n"
 					"Invalid graphics api was in use.",
 					DEBUG__ERROR_LEVEL__FATAL_ERROR
 				);
