@@ -18,6 +18,7 @@ namespace fungine
 				std::vector<std::pair<std::shared_ptr<Material>, std::vector<entities::Entity*>>> _batches;
 
 			public:
+
 				TerrainRenderer();
 				~TerrainRenderer();
 

@@ -34,8 +34,7 @@ namespace fungine
 		class DirectionalLight : public Light
 		{
 		private:
-			mml::Vector3 _direction = mml::Vector3(0, -1, -1);
-
+			
 			DirectionalShadowCaster _shadowCaster;
 
 			// *->TEMP
@@ -43,19 +42,18 @@ namespace fungine
 
 		public:
 			DirectionalLight(
-				const mml::Vector3& direction,
 				const mml::Vector3& color,
 				const mml::Vector3& ambientColor,
 				unsigned int shadowmapWidth, 
 				unsigned int shadowmapHeight,
+				const std::shared_ptr<Transform>& entityTransform,
 				const std::string& name = DIRECTIONAL_LIGHT_DEFAULT_NAME
 			);
 			~DirectionalLight();
 
 			virtual void update() override;
 
-			inline void setDirection(const mml::Vector3& dir) { _direction = dir; }
-			inline const mml::Vector3& getDirection() const { return _direction; }
+			const mml::Vector3& getDirection() const;
 			
 			inline ShadowCaster& getShadowCaster() { return _shadowCaster; }
 

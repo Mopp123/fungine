@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Vector3.h"
+#include "Vector4.h"
 #include "Quaternion.h"
 
 namespace mml
@@ -41,7 +42,9 @@ namespace mml
 		const float& operator[](int i) const; // I have no idea is this kind of duplication legal??
 
 		friend Matrix4 operator*(const Matrix4& left, const Matrix4& right);
+		friend Vector4 operator*(const Matrix4& left, const Vector4& right);
 		friend Matrix4 operator*(const Matrix4& left, float val);
+
 	};
 
 	void create_orthographic_projection_matrix(

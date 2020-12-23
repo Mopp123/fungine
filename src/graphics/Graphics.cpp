@@ -40,9 +40,16 @@ namespace fungine
 			
 			s_rendererCommands->bindFramebuffer(shadowmapFramebuffer);
 			s_rendererCommands->clear();
+			bool first = true;
 			for (Renderer* renderer : Renderer::get_all_renderers())
+			{
+				if (first)
+				{
+					first = false;
+					continue;
+				}
 				renderer->flush(shadowCaster.getProjectionMatrix(), shadowCaster.getViewMatrix());
-
+			}
 			// Render to screen
 			Framebuffer* screenFramebuffer = Renderer::get_screen_framebuffer();
 

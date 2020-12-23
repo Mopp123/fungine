@@ -252,6 +252,17 @@ namespace mml
 
 		return result;
 	}
+	Vector4 operator*(const Matrix4& left, const Vector4& right)
+	{
+		Vector4 result;
+
+		result.x = left[0 + 0 * 4] * right.x + left[0 + 1 * 4] * right.y + left[0 + 2 * 4] * right.z + left[0 + 3 * 4] * right.w;
+		result.y = left[1 + 0 * 4] * right.x + left[1 + 1 * 4] * right.y + left[1 + 2 * 4] * right.z + left[1 + 3 * 4] * right.w;
+		result.z = left[2 + 0 * 4] * right.x + left[2 + 1 * 4] * right.y + left[2 + 2 * 4] * right.z + left[2 + 3 * 4] * right.w;
+		result.w = left[3 + 0 * 4] * right.x + left[3 + 1 * 4] * right.y + left[3 + 2 * 4] * right.z + left[3 + 3 * 4] * right.w;
+
+		return result;
+	}
 	Matrix4 operator*(const Matrix4& left, float val)
 	{
 		return Matrix4(1.0f);

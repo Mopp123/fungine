@@ -13,16 +13,16 @@ namespace fungine
 	{
 		namespace commonEntityFactory
 		{
-			Entity* create_entity__Camera(const mml::Vector3& pos, const mml::Quaternion& rot, const mml::Matrix4& projMat)
+			Entity* create_entity__Camera(const mml::Vector3& pos, const mml::Quaternion& rot)
 			{
 				Entity* e = new Entity;
 				e->addComponent(std::make_shared<Transform>(pos, rot, mml::Vector3(1, 1, 1)));
-				e->addComponent(std::make_shared<Camera>(projMat));
+				e->addComponent(std::make_shared<Camera>());
 				return e;
 			}
 			
 			Entity* create_entity__DirectionalLight(
-				const mml::Vector3& direction,
+				const mml::Quaternion& rotation,
 				const mml::Vector3& color,
 				const mml::Vector3& ambientColor,
 				unsigned int shadowmapWidth,
@@ -30,8 +30,9 @@ namespace fungine
 			)
 			{
 				Entity* e = new Entity;
-				e->addComponent(std::make_shared<Transform>(mml::Vector3(-10, 10, 10), mml::Quaternion({0,1,0}, 0), mml::Vector3(1, 1, 1)));
-				e->addComponent(std::make_shared<DirectionalLight>(direction, color, ambientColor, shadowmapWidth, shadowmapHeight));
+				std::shared_ptr<Transform> transform = std::make_shared<Transform>(mml::Vector3(-10, 10, 10), rotation, mml::Vector3(1, 1, 1));
+				e->addComponent(transform);
+				e->addComponent(std::make_shared<DirectionalLight>(color, ambientColor, shadowmapWidth, shadowmapHeight, transform));
 				return e;
 			}
 		}

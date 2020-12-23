@@ -13,8 +13,8 @@ namespace fungine
 
 		Camera* Camera::s_currentCamera = nullptr;
 
-		Camera::Camera(const mml::Matrix4& projMat, const std::string& name) :
-			Component(name), _projectionMatrix(projMat)
+		Camera::Camera(const std::string& name) :
+			Component(name)
 		{
 			// *->TEMP just temporarely make current camera the lastly created camera
 			s_currentCamera = this;
@@ -23,6 +23,21 @@ namespace fungine
 		Camera::~Camera()
 		{
 			Debug::notify_on_destroy(_name + "(Camera)");
+		}
+
+		void Camera::setPerspectiveProjection(float fov, float aspectRatio, float zNear, float zFar)
+		{
+			_fov = fov;
+			_aspectRatio = aspectRatio;
+			_zNear = zNear;
+			_zFar = zFar;
+			mml::create_perspective_projection_matrix(_projectionMatrix, _fov, _aspectRatio, _zNear, _zFar);
+		}
+		void Camera::setOrthographicProjection(float left, float right, float top, float bottom, float zNear, float zFar)
+		{
+			_zNear = zNear;
+			_zFar = zFar;
+			mml::create_orthographic_projection_matrix(_projectionMatrix, left, right, top, bottom, _zNear, _zFar);
 		}
 
 		void Camera::update()

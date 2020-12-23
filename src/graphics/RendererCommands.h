@@ -38,6 +38,8 @@ namespace fungine
 			virtual void init() const = 0;
 			virtual void clear() const = 0;
 
+			virtual void bindTexture(Texture* texture, unsigned int slot) const = 0;
+			virtual void unbindTexture() const = 0;
 			virtual void bindMesh(const components::Mesh* const mesh) const = 0;
 			virtual void unbindMesh(const components::Mesh* const mesh) const = 0;
 			virtual void drawIndices(const components::Mesh* const mesh) const = 0;

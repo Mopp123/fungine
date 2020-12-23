@@ -1,7 +1,9 @@
 #pragma once
 
 #include "utils/myMathLib/MyMathLib.h"
+#include "components/common/Transform.h"
 #include "graphics/Framebuffer.h"
+#include <memory>
 
 namespace fungine
 {
@@ -15,11 +17,15 @@ namespace fungine
 			mml::Matrix4 _viewMatrix;
 
 			graphics::Framebuffer* _framebuffer = nullptr;
-			graphics::Texture* _shadowmap;
+			graphics::Texture* _shadowmap = nullptr;
+
+			std::shared_ptr<Transform> _transform = nullptr;
+
+			float _maxShadowDistance = 100.0f;
 
 		public:
 
-			ShadowCaster() {}
+			ShadowCaster(const std::shared_ptr<Transform>& t);
 			virtual ~ShadowCaster() {}
 			virtual void init(unsigned int shadowmapWidth, unsigned int shadowmapHeight) = 0;
 
@@ -35,7 +41,7 @@ namespace fungine
 		class DirectionalShadowCaster : public ShadowCaster
 		{
 		public:
-			DirectionalShadowCaster();
+			DirectionalShadowCaster(const std::shared_ptr<Transform>& t);
 			~DirectionalShadowCaster();
 			virtual void init(unsigned int shadowmapWidth, unsigned int shadowmapHeight) override;
 			virtual void update() override;

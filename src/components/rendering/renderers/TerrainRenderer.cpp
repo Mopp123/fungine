@@ -81,6 +81,17 @@ namespace fungine
 					shader->setUniform("directionalLight_ambientColor", directionalLight->getAmbientColor());
 					shader->setUniform("directionalLight_color", directionalLight->getColor());
 
+
+					// JUST TESTING
+					// Shadowing uniforms
+					ShadowCaster& shadowCaster = directionalLight->getShadowCaster();
+					shader->setUniform("shadowProjMat", shadowCaster.getProjectionMatrix());
+					shader->setUniform("shadowViewMat", shadowCaster.getViewMatrix());
+
+					shader->setUniform("texture_shadowmap", 14);
+
+					rendererCommands->bindTexture(shadowCaster.getShadowmapTexture(), 14);
+
 					// per entity inside the batch
 					for (Entity* e : batch.second)
 					{

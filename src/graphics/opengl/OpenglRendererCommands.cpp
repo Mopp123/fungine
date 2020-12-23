@@ -1,11 +1,13 @@
 
 #include <GLEW/glew.h>
+#include "core/window/Window.h"
 #include "core/Program.h"
 #include "OpenglRendererCommands.h"
 #include "core/Debug.h"
 
 namespace fungine
 {
+	using namespace core;
 	using namespace components;
 
 	namespace graphics
@@ -37,6 +39,20 @@ namespace fungine
 				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 				GL_FUNC(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 			}
+
+			void OpenglRendererCommands::bindTexture(Texture* texture, unsigned int slot) const
+			{
+				GLenum glTextureSlot = GL_NONE;
+				convert_to_GLenum__texture_slot(slot, glTextureSlot);
+				GL_FUNC(glActiveTexture(glTextureSlot));
+				GL_FUNC(glBindTexture(GL_TEXTURE_2D, texture->getID()));
+			}
+			void OpenglRendererCommands::unbindTexture() const
+			{
+				GL_FUNC(glActiveTexture(GL_TEXTURE0));
+				GL_FUNC(glBindTexture(GL_TEXTURE_2D, 0));
+			}
+
 			void OpenglRendererCommands::bindMesh(const Mesh* const mesh) const
 			{
 				GL_FUNC(glBindVertexArray(mesh->getAPISpecific_vaoID()));
@@ -141,7 +157,7 @@ namespace fungine
 			void OpenglRendererCommands::bindFramebuffer(const Framebuffer* const framebuffer) const
 			{
 				GL_FUNC(glBindFramebuffer(GL_FRAMEBUFFER, framebuffer->getID()));
-				GL_FUNC(glViewport(0, 0, framebuffer->getWidth(), framebuffer->getHeight()));
+				GL_FUNC(glViewport(0, 0, Window::get_width(), Window::get_height()));
 			}
 			void OpenglRendererCommands::unbindFramebuffer(const Framebuffer* const framebuffer) const
 			{
@@ -160,6 +176,7 @@ namespace fungine
 				}
 
 				GL_FUNC(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+				GL_FUNC(glViewport(0, 0, Window::get_width(), Window::get_height()));
 			}
 		}
 	}
