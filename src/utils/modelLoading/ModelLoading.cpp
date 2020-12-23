@@ -47,7 +47,8 @@ namespace fungine
 				aiMesh* assimpMesh, 
 				unsigned int meshBaseIndex, 
 				bool loadTangents, 
-				bool loadBones
+				bool loadBones,
+				unsigned int instanceCount
 			)
 			{
 				const bool hasTexCoords = assimpMesh->HasTextureCoords(0);
@@ -81,15 +82,19 @@ namespace fungine
 				if (hasTangents)	vb_layout.add({ 3, ShaderDataType::Float3 });
 
 				// Create the fat "basic stuff" vertex buffer
-				VertexBuffer* vertexBuffer = VertexBuffer::create_vertex_buffer(vertexData, BufferUsage::StaticDraw, vb_layout);
-
-				
+				VertexBuffer<float>* vertexBuffer = VertexBuffer<float>::create_vertex_buffer(
+					&vertexData[0], 
+					sizeof(float) * vertexData.size(), 
+					BufferUsage::StaticDraw, vb_layout
+				);
 				IndexBuffer* indexBuffer = IndexBuffer::create_index_buffer(indices);
+
+				std::vector<VertexBuffer<float>*> allVertexBuffers = {vertexBuffer};
 
 				// Then all custom shit.. instanced buffers, skinning stuff.. etc, depending on what kind of mesh this is..
 				if (!hasBones)
 				{
-					return Mesh::create_mesh({ vertexBuffer }, indexBuffer, DrawType::Triangles, meshName);
+					return Mesh::create_mesh(allVertexBuffers, indexBuffer, DrawType::Triangles, instanceCount, meshName);
 				}
 #ifndef DISABLE_SKINNED_MESH_LOADING
 				else if (hasBones)
@@ -258,9 +263,9 @@ namespace fungine
 				);
 
 				// notify the material, do we have specular and normap maps specified or not?
-				outMaterial->setHasNormalMap(normalTexture != nullptr);
+				outMaterial->setHasNormalMap((*normalTexture) != nullptr);
 
-				if (specularTexture)
+				if ((*specularTexture))
 				{
 					outMaterial->setHasSpecularMap(true);
 
@@ -322,6 +327,8 @@ namespace fungine
 				bool loadTangents, 
 				bool loadMaterial,
 
+				unsigned int instanceCount,
+
 				std::vector<std::shared_ptr<Mesh>>& outMeshes,
 				std::vector<Texture*>& outTextures,
 				std::vector<std::shared_ptr<Material>>& outMaterials
@@ -353,11 +360,11 @@ namespace fungine
 						if (material) outMaterials.push_back(material);
 					}
 
-					outMeshes.push_back(convert_assimp_mesh(assimpScene, assimpMesh, 0, loadTangents, assimpMesh->HasBones()));
+					outMeshes.push_back(convert_assimp_mesh(assimpScene, assimpMesh, 0, loadTangents, assimpMesh->HasBones(), instanceCount));
 				}
 
 				for (int i = 0; i < assimpNode->mNumChildren; i++)
-					process_assimp_node(assimpScene, assimpNode->mChildren[i], loadTangents, loadMaterial, outMeshes, outTextures, outMaterials);
+					process_assimp_node(assimpScene, assimpNode->mChildren[i], loadTangents, loadMaterial, instanceCount, outMeshes, outTextures, outMaterials);
 			}
 
 
@@ -384,7 +391,8 @@ namespace fungine
 				std::vector<std::shared_ptr<components::Material>>& outMaterials,
 
 				unsigned int postProcessFlags, 
-				bool loadMaterialData
+				bool loadMaterialData,
+				unsigned int instanceCount
 			)
 			{
 				unsigned int assimpPostProcessFlags = convert_to_assimp_post_process(postProcessFlags);
@@ -423,6 +431,8 @@ namespace fungine
 					loadTangents,
 					
 					loadMaterialData,
+					instanceCount,
+
 					outMeshes, 
 					outTextures,
 					outMaterials

@@ -11,6 +11,7 @@ namespace fungine
 
 		static int s_frames;
 
+		static double s_fpsStartTime;
 		static double s_frameStartTime;
 
 	public:
@@ -18,6 +19,8 @@ namespace fungine
 		Time();
 		static void update();
 
+		static double get_time();
 		inline static double get_fps() { return s_fps; }
+		inline static double get_delta_time() { return s_deltaTime; }
 	};
 }

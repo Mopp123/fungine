@@ -19,6 +19,7 @@ namespace fungine
 			int _samples = 1;
 
 			Texture* _colorTextures[FRAMEBUFFER__MAX_COLOR_TEXTURES] = { nullptr };
+			Texture* _depthTexture = nullptr;
 			unsigned int _colorAttachmentCount = 0;
 
 			// If this framebuffer is multisampled we need another "regular" framebuffer with "regular" color attachment
@@ -31,7 +32,7 @@ namespace fungine
 			virtual ~Framebuffer();
 
 			virtual Texture* addColorAttachment() = 0;
-			virtual void createDepthAttachment() = 0;
+			virtual Texture* createDepthAttachment() = 0;
 
 			static Framebuffer* create_framebuffer(int width, int height, bool isDefaultFramebuffer = false, int samples = 1);
 

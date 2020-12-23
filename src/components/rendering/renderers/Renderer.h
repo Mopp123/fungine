@@ -1,15 +1,15 @@
 #pragma once
 
 #include "components/Component.h"
+#include "graphics/Graphics.h"
 #include "entities/Entity.h"
 #include "components/rendering/Mesh.h"
 #include "components/rendering/Material.h"
 #include "graphics/Framebuffer.h"
 #include <unordered_map>
 
-/*
-	Renderer's are completely static components
-*/
+#define RENDERER_DEFAULT_NAME "Renderer"
+
 namespace fungine
 {
 	namespace components
@@ -43,26 +43,34 @@ namespace fungine
 			{
 			protected:
 
+				static std::vector<Renderer*> s_allRenderers;
+
 				std::vector<entities::Entity*> _entities; // Entities this renderer has been attached to
-				RenderPass _renderPass;
+				
+				bool _batchCreated = false;
 
 				static graphics::Framebuffer* s_framebuffer; // *->TEMP : just testing framebuffer here..
 
 			public:
-				Renderer();
+				Renderer(const std::string& name = RENDERER_DEFAULT_NAME);
 				virtual ~Renderer();
 				
 				virtual void onAttackToEntity(entities::Entity* entity) override;
 				virtual void update() override;
 
-				// processes all render passes and after that clears all render ques
-				virtual void flush();
+				virtual void flush(
+					const mml::Matrix4& projectionMatrix,
+					const mml::Matrix4& viewMatrix
+				) {}
 
+				virtual void clear() {}
+
+				inline static std::vector<Renderer*> get_all_renderers() { return s_allRenderers; }
+				inline static graphics::Framebuffer* get_screen_framebuffer() { return s_framebuffer; }
 				virtual const size_t getSize() const override;
 
 			protected:
-				virtual void submit(entities::Entity* entity);
-				void clear();
+				virtual void submit(entities::Entity* entity) {}
 			};
 		}
 	}

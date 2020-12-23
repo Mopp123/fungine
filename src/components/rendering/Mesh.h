@@ -18,9 +18,7 @@ namespace fungine
 		{
 		protected:
 
-			std::string _name = "";
-
-			std::vector<graphics::VertexBuffer*> _vertexBuffers;
+			std::vector<graphics::VertexBuffer<float>*> _vertexBuffers;
 			graphics::IndexBuffer* _indexBuffer;
 			graphics::DrawType _drawType;
 
@@ -35,15 +33,16 @@ namespace fungine
 
 		public:
 
-			Mesh(std::vector<graphics::VertexBuffer*> vertexBuffers, graphics::IndexBuffer* indexBuffer, graphics::DrawType drawType, const std::string& name = "", entities::Entity* entity = nullptr);
+			Mesh(graphics::IndexBuffer* indexBuffer, graphics::DrawType drawType, unsigned int instanceCount = 1, const std::string& name = "", bool isStatic = false);
 			virtual ~Mesh();
 			virtual const size_t getSize() const override;
 
-			static std::shared_ptr<Mesh> create_mesh(std::vector<graphics::VertexBuffer*> vertexBuffers, graphics::IndexBuffer* indexBuffer, graphics::DrawType drawType, const std::string& name = "");
+			virtual void addVertexBuffer(graphics::VertexBuffer<float>* buffer) {}
 
-			inline const std::string& getName() const { return _name; }
-
-			inline const std::vector<graphics::VertexBuffer*>& getVertexBuffers() const { return _vertexBuffers; }
+			static std::shared_ptr<Mesh> create_mesh(std::vector<graphics::VertexBuffer<float>*> vertexBuffers, graphics::IndexBuffer* indexBuffer, graphics::DrawType drawType, unsigned int instanceCount = 1, const std::string& name = "", bool isStatic = false);
+			
+			inline const std::vector<graphics::VertexBuffer<float>*>& getVertexBuffers() const { return _vertexBuffers; }
+			inline graphics::IndexBuffer* getIndexBuffer() { return _indexBuffer; }
 			inline const graphics::IndexBuffer* getIndexBuffer() const { return _indexBuffer; }
 
 			inline const graphics::DrawType& getDrawType() const { return _drawType; }

@@ -8,8 +8,8 @@ namespace fungine
 	namespace components
 	{
 
-		Transform::Transform(const mml::Vector3& pos, const mml::Quaternion& rot, const mml::Vector3& scale, entities::Entity* entity) : 
-			Component(entity)
+		Transform::Transform(const mml::Vector3& pos, const mml::Quaternion& rot, const mml::Vector3& scale, bool isStatic) :
+			Component(DEFAULT_NAME_TRANSFORM, isStatic)
 		{
 			_translationMatrix.setIdentity();
 			_rotationMatrix.setIdentity();
@@ -27,7 +27,7 @@ namespace fungine
 
 		Transform::~Transform()
 		{
-			Debug::notify_on_destroy("Transform");
+			Debug::notify_on_destroy(DEFAULT_NAME_TRANSFORM);
 		}
 
 		void Transform::update()
@@ -58,7 +58,7 @@ namespace fungine
 
 		mml::Vector3 Transform::getPosition() const
 		{
-			return { _transformationMatrix[0 + 3 * 4],_transformationMatrix[1 + 3 * 4] ,_transformationMatrix[2 + 3 * 4] };
+			return { _transformationMatrix[0 + 3 * 4], _transformationMatrix[1 + 3 * 4], _transformationMatrix[2 + 3 * 4] };
 		}
 		mml::Quaternion Transform::getRotation() const // *->TEMP OPTIMIZE THE SHIT OUT OF THIS!
 		{

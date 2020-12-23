@@ -4,6 +4,8 @@
 #include "utils/myMathLib/MyMathLib.h"
 #include "components/common/Transform.h"
 
+#define CAMERA_DEFAULT_NAME "MainCamera"
+
 namespace fungine
 {
 	namespace components
@@ -20,7 +22,7 @@ namespace fungine
 
 		public:
 
-			Camera(const mml::Matrix4& projMat, entities::Entity* entity = nullptr);
+			Camera(const mml::Matrix4& projMat, const std::string& name = CAMERA_DEFAULT_NAME);
 			~Camera();
 
 			virtual void update() override;

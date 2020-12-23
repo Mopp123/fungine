@@ -12,7 +12,7 @@
 
 // Debug modes(Only one can be defined at a time):
 	// Enables all debug stuff
-		#define DEBUG__MODE_FULL
+		//#define DEBUG__MODE_FULL
 
 	// Enables only required debug stuff (disables graphics api related debug stuff..)
 		//#define DEBUG__MODE_NONE
@@ -31,9 +31,7 @@ case GL_OUT_OF_MEMORY:					Debug::log("Opengl Error: GL_OUT_OF_MEMORY");break;		
 case GL_STACK_UNDERFLOW:				Debug::log("Opengl Error: GL_STACK_UNDERFLOW");break;				\
 case GL_STACK_OVERFLOW:					Debug::log("Opengl Error: GL_STACK_OVERFLOW");break;				\
 default: break;}
-#endif
-
-#ifdef DEBUG__MODE_NONE
+#else
 #define GL_FUNC(func)	func;
 #endif
 

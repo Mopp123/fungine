@@ -98,6 +98,7 @@ namespace fungine
 					{
 						_uniformCache.insert(std::make_pair(uniformName, uniformLocation));
 					}
+#ifdef DEBUG__MODE_FULL
 					else
 					{
 						Debug::log(
@@ -106,6 +107,7 @@ namespace fungine
 							DEBUG__ERROR_LEVEL__ERROR
 						);
 					}
+#endif
 					return uniformLocation;
 				}
 			}

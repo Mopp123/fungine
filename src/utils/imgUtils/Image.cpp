@@ -48,4 +48,66 @@ namespace fungine
 		stbi_image_free(stbImageData);
 		return imgData;
 	}
+
+
+	void ImageData::setColor(int x, int y, byte r, byte g, byte b, byte a)
+	{
+		if (x < 0 || x >= _width || y < 0 || y >= _height)
+		{
+#ifdef DEBUG__MODE_FULL
+			Debug::log(
+				"Location: void ImageData::setColor(int x, int y, byte r, byte g, byte b, byte a)\n"
+				"Invalid pixel coordinates: " + std::to_string(x) + ", " + std::to_string(y) + "\n"
+				"Image's dimensions were: " + std::to_string(_width) + "x" + std::to_string(_height),
+				DEBUG__ERROR_LEVEL__ERROR
+			);
+#endif
+			return;
+		}
+
+		unsigned int pixelIndex_r = (x + y * _width) * _channels;
+		unsigned int pixelIndex_g = (x + y * _width) * _channels + 1;
+		unsigned int pixelIndex_b = (x + y * _width) * _channels + 2;
+		unsigned int pixelIndex_a = (x + y * _width) * _channels + 3;
+		_data[pixelIndex_r] = r;
+		if (_channels <= 1) return;
+		_data[pixelIndex_g] = g;
+		if (_channels <= 2) return;
+		_data[pixelIndex_b] = b;
+		if (_channels <= 3) return;
+		_data[pixelIndex_a] = a;
+	}
+	byte ImageData::getColorChannel(int x, int y, unsigned int channel) const
+	{
+		if (channel >= _channels)
+		{
+#ifdef DEBUG__MODE_FULL
+			Debug::log(
+				"Location: byte ImageData::getColorChannel(int x, int y, unsigned int channel) const\n"
+				"Attempted to get image color value at invalid channel!\n"
+				"Attempted to access channel: " + std::to_string(channel) + "\n"
+				"Image had: " + std::to_string(_channels) + " channels.",
+				DEBUG__ERROR_LEVEL__ERROR
+			);
+#endif
+			return 0;
+		}
+
+		size_t imgSize = _width * _height * _channels;
+		unsigned int pixelIndex = (x + y * _width) * _channels + channel;
+		if (pixelIndex >= imgSize)
+		{
+#ifdef DEBUG__MODE_FULL
+			Debug::log(
+				"Location: byte ImageData::getColorChannel(int x, int y, unsigned int channel) const\n"
+				"Invalid pixel coordinates: " + std::to_string(x) + ", " + std::to_string(y) + "\n"
+				"Image's dimensions were: " + std::to_string(_width) + "x" + std::to_string(_height),
+				DEBUG__ERROR_LEVEL__ERROR
+			);
+#endif
+			return 0;
+		}
+
+		return _data[pixelIndex];
+	}
 }

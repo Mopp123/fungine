@@ -39,7 +39,8 @@ namespace fungine
 				std::vector< std::shared_ptr<components::Material>>& outMaterials,
 
 				unsigned int postProcessFlags, 
-				bool loadMaterialData
+				bool loadMaterialData,
+				unsigned int instanceCount
 			);
 		}
 	}

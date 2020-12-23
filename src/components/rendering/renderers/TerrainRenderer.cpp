@@ -28,7 +28,28 @@ namespace fungine
 			TerrainRenderer::~TerrainRenderer()
 			{}
 
-			void TerrainRenderer::flush()
+
+			void TerrainRenderer::submit(Entity* e)
+			{
+				std::shared_ptr<Material> entityMaterial = e->getComponent<Material>();
+				for (std::pair<std::shared_ptr<Material>, std::vector<Entity*>>& batch : _batches)
+				{
+					if (batch.first == entityMaterial)
+					{
+						batch.second.push_back(e);
+						return;
+					}
+				}
+
+				std::vector<Entity*> newBatch;
+				newBatch.push_back(e);
+				_batches.push_back(std::make_pair(entityMaterial, newBatch));
+			}
+
+			void TerrainRenderer::flush(
+				const mml::Matrix4& projectionMatrix,
+				const mml::Matrix4& viewMatrix
+			)
 			{
 				const RendererCommands* rendererCommands = Graphics::get_renderer_commands();
 				Camera* camera = Camera::get_current_camera();
@@ -42,16 +63,10 @@ namespace fungine
 						"Tried to flush renderer, but the current camera was nullptr!",
 						DEBUG__ERROR_LEVEL__ERROR
 					);
-					clear();
 					return;
 				}
 #endif
-
-
-				// * for each render pass in the future
-				rendererCommands->bindFramebuffer(s_framebuffer);
-
-				for (auto& batch : _renderPass.renderQue.getBatches())
+				for (std::pair<std::shared_ptr<Material>, std::vector<Entity*>>& batch : _batches)
 				{
 					Material* material = batch.first.get();
 					ShaderProgram* shader = material->getShader();
@@ -59,21 +74,19 @@ namespace fungine
 					rendererCommands->bindMaterial(material);
 
 					// common uniforms
-					shader->setUniform("projectionMatrix", camera->getProjectionMatrix());
-					shader->setUniform("viewMatrix", camera->getViewMatrix());
+					shader->setUniform("projectionMatrix", projectionMatrix);
+					shader->setUniform("viewMatrix", viewMatrix);
 					shader->setUniform("cameraPos", camera->getEntity()->getComponent<Transform>()->getPosition());
 					shader->setUniform("directionalLight_direction", directionalLight->getDirection());
 					shader->setUniform("directionalLight_ambientColor", directionalLight->getAmbientColor());
 					shader->setUniform("directionalLight_color", directionalLight->getColor());
 
 					// per entity inside the batch
-					for (int i = 0; i < batch.second.size(); ++i)
+					for (Entity* e : batch.second)
 					{
-						Entity* entity = batch.second[i]->getEntity();
-
-						std::shared_ptr<Mesh> mesh = entity->getComponent<Mesh>();
+						std::shared_ptr<Mesh> mesh = e->getComponent<Mesh>();
 						// per entity uniforms
-						shader->setUniform("transformationMatrix", entity->getComponent<Transform>()->getTransformationMatrix());
+						shader->setUniform("transformationMatrix", e->getComponent<Transform>()->getTransformationMatrix());
 
 						// Finally drawing..
 						rendererCommands->bindMesh(mesh.get());
@@ -83,9 +96,12 @@ namespace fungine
 
 					rendererCommands->unbindMaterial(material);
 				}
-				rendererCommands->unbindFramebuffer(nullptr);
+			}
 
-				clear();
+
+			void TerrainRenderer::clear()
+			{
+				_batches.clear();
 			}
 
 			const size_t TerrainRenderer::getSize() const

@@ -4,6 +4,8 @@
 #include <vector>
 #include "utils/myMathLib/MyMathLib.h"
 
+#define DEFAULT_NAME_TRANSFORM "Transform"
+
 namespace fungine
 {
 	namespace components
@@ -27,7 +29,7 @@ namespace fungine
 		public:
 
 
-			Transform(const mml::Vector3& pos, const mml::Quaternion& rot, const mml::Vector3& scale, entities::Entity* entity = nullptr);
+			Transform(const mml::Vector3& pos, const mml::Quaternion& rot, const mml::Vector3& scale, bool isStatic = false);
 			~Transform();
 			virtual void update() override;
 

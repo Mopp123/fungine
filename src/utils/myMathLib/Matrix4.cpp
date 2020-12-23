@@ -258,7 +258,32 @@ namespace mml
 	}
 
 	// All specific matrix creation functions---------->
-	void create_perspective_projection_matrix(Matrix4& outMatrix, float fov, float aspectRatio, float zNear, float zFar)
+	void create_orthographic_projection_matrix(
+		Matrix4& outMatrix,
+		float left, float right,
+		float top, float bottom,
+		float zNear, float zFar
+	)
+	{
+		outMatrix.setIdentity();
+
+		outMatrix[0] = 2.0f / (right - left);
+		outMatrix[1 + 1 * 4] = 2.0f / (top - bottom);
+		outMatrix[2 + 2 * 4] = -2.0f / (zFar - zNear);
+		outMatrix[3 + 3 * 4] = 1.0f;
+		outMatrix[0 + 3 * 4] = -((right + left) / (right - left));
+		outMatrix[1 + 3 * 4] = -((top + bottom) / (top - bottom));
+		outMatrix[2 + 3 * 4] = -((zFar + zNear) / (zFar - zNear));
+	}
+
+	
+	void create_perspective_projection_matrix(
+		Matrix4& outMatrix, 
+		float fov, 
+		float aspectRatio, 
+		float zNear, 
+		float zFar
+	)
 	{
 		outMatrix.setIdentity();
 		outMatrix[0 + 0 * 4] = 1.0f / (aspectRatio * std::tan(fov / 2.0f));

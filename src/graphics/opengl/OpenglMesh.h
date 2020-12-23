@@ -12,8 +12,10 @@ namespace fungine
 			{
 			public:
 
-				OpenglMesh(std::vector<VertexBuffer*> vertexBuffers, IndexBuffer* indexBuffer, graphics::DrawType drawType, const std::string& name = "");
+				OpenglMesh(std::vector<VertexBuffer<float>*> vertexBuffers, IndexBuffer* indexBuffer, graphics::DrawType drawType, unsigned int instanceCount, const std::string& name = "", bool isStatic = false);
 				~OpenglMesh();
+
+				virtual void addVertexBuffer(graphics::VertexBuffer<float>* buffer) override;
 
 				inline const unsigned int& getVaoID() const { return _vaoID; }
 			};

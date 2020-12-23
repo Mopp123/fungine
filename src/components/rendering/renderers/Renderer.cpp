@@ -1,7 +1,7 @@
 
 #include "Renderer.h"
 #include "core/window/Window.h"
-#include "graphics/Graphics.h"
+#include "utils/Time.h"
 #include "graphics/RendererCommands.h"
 #include "components/rendering/Camera.h"
 #include "components/rendering/lighting/Lights.h"
@@ -51,18 +51,23 @@ namespace fungine
 			}
 
 
-			
+			std::vector<Renderer*> Renderer::s_allRenderers;
 			Framebuffer* Renderer::s_framebuffer = nullptr;
 
-			Renderer::Renderer() :
-				Component(nullptr)
+			Renderer::Renderer(const std::string& name) :
+				Component(name)
 			{
 				if (!s_framebuffer)
 					s_framebuffer = Framebuffer::create_framebuffer(core::Window::get_width(), core::Window::get_height(), true);
+
+				s_allRenderers.push_back(this);
 			}
 
 			Renderer::~Renderer()
-			{}
+			{
+				Debug::notify_on_destroy(_name + "(Renderer)");
+				s_allRenderers.erase(std::find(s_allRenderers.begin(), s_allRenderers.end(), this));
+			}
 
 			void Renderer::onAttackToEntity(entities::Entity* entity)
 			{
@@ -73,92 +78,8 @@ namespace fungine
 			{
 				for (Entity* e : _entities)
 					submit(e);
-
-				flush();
 			}
 
-			void Renderer::submit(entities::Entity* entity)
-			{
-				std::shared_ptr<Mesh> mesh = entity->getComponent<Mesh>();
-				std::shared_ptr<Material> material = entity->getComponent<Material>();
-				if(mesh && material)
-					_renderPass.renderQue.add(mesh, material);
-			}
-
-
-			void Renderer::flush()
-			{
-				const RendererCommands* rendererCommands = Graphics::get_renderer_commands();
-				Camera* camera = Camera::get_current_camera();
-				DirectionalLight* directionalLight = DirectionalLight::get_directional_light();
-
-			#ifdef DEBUG__MODE_FULL
-				if (!camera)
-				{
-					Debug::log(
-						"Location: void Renderer::flush()\n"
-						"Tried to flush renderer, but the current camera was nullptr!",
-						DEBUG__ERROR_LEVEL__ERROR
-					);
-					clear();
-					return;
-				}
-			#endif
-
-
-				// * for each render pass in the future
-				rendererCommands->bindFramebuffer(s_framebuffer);
-
-				for (auto& batch : _renderPass.renderQue.getBatches())
-				{
-					Material* material = batch.first.get();
-					ShaderProgram* shader = material->getShader();
-
-					rendererCommands->bindMaterial(material);
-
-					// "bind texture units"
-					shader->setUniform("texture_diffuse", 0);
-
-					if (material->hasSpecularMap())
-						shader->setUniform("texture_specular", 1);
-
-					if (material->hasNormalMap())
-						shader->setUniform("texture_normal", 2);
-
-					// common uniforms
-					shader->setUniform("projectionMatrix", camera->getProjectionMatrix());
-					shader->setUniform("viewMatrix", camera->getViewMatrix());
-					shader->setUniform("cameraPos", camera->getEntity()->getComponent<Transform>()->getPosition());
-					shader->setUniform("directionalLight_direction", directionalLight->getDirection());
-					shader->setUniform("directionalLight_ambientColor", directionalLight->getAmbientColor());
-					shader->setUniform("directionalLight_color", directionalLight->getColor());
-
-					// per entity inside the batch
-					for (int i = 0; i < batch.second.size(); ++i)
-					{
-						Entity* entity = batch.second[i]->getEntity();
-
-						std::shared_ptr<Mesh> mesh = entity->getComponent<Mesh>();
-						// per entity uniforms
-						shader->setUniform("transformationMatrix", entity->getComponent<Transform>()->getTransformationMatrix());
-
-						// Finally drawing..
-						rendererCommands->bindMesh(mesh.get());
-						rendererCommands->drawIndices(mesh.get());
-						rendererCommands->unbindMesh(mesh.get());
-					}
-
-					rendererCommands->unbindMaterial(material);
-				}
-				rendererCommands->unbindFramebuffer(nullptr);
-
-				clear();
-			}
-
-			void Renderer::clear()
-			{
-				_renderPass.renderQue.clear();
-			}
 
 			const size_t Renderer::getSize() const
 			{

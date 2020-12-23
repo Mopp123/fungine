@@ -44,11 +44,30 @@ namespace mml
 		friend Matrix4 operator*(const Matrix4& left, float val);
 	};
 
-	void create_perspective_projection_matrix(Matrix4& outMatrix, float fov, float aspectRatio, float zNear, float zFar);
+	void create_orthographic_projection_matrix(
+		Matrix4& outMatrix,
+		float left, float right,
+		float top, float bottom,
+		float zNear, float zFar
+	);
+	void create_perspective_projection_matrix(
+		Matrix4& outMatrix, 
+		float fov, 
+		float aspectRatio, 
+		float zNear, 
+		float zFar
+	);
+	
 	void translate_matrix(Matrix4& outMatrix, const Vector3& position);
 	void rotate_matrix(Matrix4& outMatrix, const Quaternion& rotation);
 	void scale_matrix(Matrix4& outMatrix, const Vector3& scale);
 	
-	void create_transformation_matrix(Matrix4& outMatrix, const Vector3& position, const Quaternion& rotation, const mml::Vector3& scale);
+	void create_transformation_matrix(
+		Matrix4& outMatrix, 
+		const Vector3& position, 
+		const Quaternion& rotation, 
+		const mml::Vector3& scale
+	);
+	
 	void create_view_matrix(Matrix4& outMatrix, const Vector3& viewPos, const Quaternion& viewRotation);
 }

@@ -9,15 +9,19 @@ namespace fungine
 	{
 		namespace opengl
 		{
-			class OpenglVertexBuffer : public VertexBuffer
+			
+			template<typename T>
+			class OpenglVertexBuffer : public VertexBuffer<T>
 			{
 			public:
-				OpenglVertexBuffer(const std::vector<float>& data, BufferUsage usage, const VertexBufferLayout& layout);
+				OpenglVertexBuffer(T* data, size_t dataSize, BufferUsage usage, const VertexBufferLayout& layout);
 				~OpenglVertexBuffer();
 
 				// Updates the buffer starting from "offset" with new data
-				virtual void update(unsigned int offset, const std::vector<float>& data) override;
+				// Mesh which owns this buffer, must be bound when calling this.
+				virtual void update(int offset, size_t dataSize, const void* data) override;
 			};
+
 
 			class OpenglIndexBuffer : public IndexBuffer
 			{

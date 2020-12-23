@@ -11,24 +11,32 @@ namespace fungine
 
 	int Time::s_frames = 0;
 
+	double Time::s_fpsStartTime = 0.0;
 	double Time::s_frameStartTime = 0.0;
 
 
 	Time::Time()
 	{
+		s_fpsStartTime = glfwGetTime();
 		s_frameStartTime = glfwGetTime();
 	}
 
 	void Time::update()
 	{
-		if (glfwGetTime() - s_frameStartTime > 0.25 && s_frames > 10)
+		if (glfwGetTime() - s_fpsStartTime > 0.25 && s_frames > 10)
 		{
-			s_fps = (double)(s_frames) / (glfwGetTime() - s_frameStartTime);
-			printf("Fps: %f\n", s_fps);
+			s_fps = (double)(s_frames) / (glfwGetTime() - s_fpsStartTime);
+			printf("Fps: %f		Delta: %f\n", s_fps, s_deltaTime);
+			s_fpsStartTime = glfwGetTime();
 			s_frames = 0;
-			s_frameStartTime = glfwGetTime();
 		}
 		s_frames++;
+		s_deltaTime = glfwGetTime() - s_frameStartTime;
+		s_frameStartTime = glfwGetTime();
 	}
 
+	double Time::get_time()
+	{
+		return glfwGetTime();
+	}
 }

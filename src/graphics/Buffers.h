@@ -57,15 +57,17 @@ namespace fungine
 		private:
 			unsigned int _slot = 0;
 			ShaderDataType _shaderDataType;
+			bool _instanced = false;
 
 		public:
-			VertexBufferElement(unsigned int slot, ShaderDataType dataType) :
-				_slot(slot), _shaderDataType(dataType)
+			VertexBufferElement(unsigned int slot, ShaderDataType dataType, bool instanced = false) :
+				_slot(slot), _shaderDataType(dataType), _instanced(instanced)
 			{}
 
 			virtual ~VertexBufferElement() {}
 			inline unsigned int getSlot() const { return _slot; }
 			inline ShaderDataType getShaderDataType() const { return _shaderDataType; }
+			inline bool isInstanced() const { return _instanced; }
 		};
 
 		class VertexBufferLayout
@@ -86,11 +88,14 @@ namespace fungine
 		};
 
 
+		
+		template<typename T>
 		class VertexBuffer
 		{
 		protected:
 			unsigned int _id = 0;
-			std::vector<float> _data;
+			T* _data;
+			size_t _dataSize;
 			VertexBufferLayout _layout;
 
 			// We allow VertexBuffer creation only through the function "create_vertex_buffer".
@@ -98,16 +103,17 @@ namespace fungine
 			void* operator new(size_t);
 
 		public:
-			VertexBuffer(const std::vector<float>& data, BufferUsage usage, const VertexBufferLayout& layout);
+			VertexBuffer(T* data, size_t dataSize, BufferUsage usage, const VertexBufferLayout& layout);
 			virtual ~VertexBuffer();
 
-			static VertexBuffer* create_vertex_buffer(const std::vector<float>& data, BufferUsage usage, const VertexBufferLayout& layout);
+			static VertexBuffer* create_vertex_buffer(T* data, size_t dataSize, BufferUsage usage, const VertexBufferLayout& layout);
 
 			// Updates the buffer starting from "offset" with new data
-			virtual void update(unsigned int offset, const std::vector<float>& data) = 0;
+			// Mesh which owns this buffer, must be bound when calling this.
+			virtual void update(int offset, size_t dataSize, const void* data) = 0;
 
 			inline const unsigned int& getID() const { return _id; }
-			inline const std::vector<float>& getData() const { return  _data; }
+			inline const T* getData() const { return  _data; }
 			inline const VertexBufferLayout& getLayout() const { return  _layout; }
 		};
 

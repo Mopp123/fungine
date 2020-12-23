@@ -7,4 +7,10 @@
 
 namespace mml
 {
+	float get_triangle_height_barycentric(
+		const mml::Vector3& p1,
+		const mml::Vector3& p2,
+		const mml::Vector3& p3,
+		const mml::Vector2& pos
+	);
 }

@@ -48,12 +48,6 @@ namespace fungine
 			{
 				GL_FUNC(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 
-				for (int i = 0; i < _colorAttachmentCount; i++)
-				{
-					if (_colorTextures[i])
-						delete _colorTextures[i];
-				}
-
 				if (_id != GL_NONE)
 					GL_FUNC(glDeleteFramebuffers(1, &_id));
 
@@ -122,8 +116,46 @@ namespace fungine
 				return colorTexture;
 			}
 
-			void OpenglFramebuffer::createDepthAttachment()
-			{}
+			Texture* OpenglFramebuffer::createDepthAttachment()
+			{
+				Texture* depthTexture = Texture::create_texture(
+					0, _width, _height, 1,
+					TextureFormat::Depth, TextureFormat::Depth,
+					TextureDataType::Float,
+					TextureWrapping::ClampToBorder, TextureWrapping::ClampToBorder,
+					TextureFiltering::Nearest, TextureFiltering::Nearest
+				);
+
+				GLenum glTextureTarget = GL_TEXTURE_2D;
+				GLenum glAttachment = GL_DEPTH_ATTACHMENT;
+
+				GL_FUNC(glBindFramebuffer(GL_FRAMEBUFFER, _id));
+				GL_FUNC(glBindTexture(glTextureTarget, depthTexture->getID())); // *Not sure is this required here
+				
+				GL_FUNC(glFramebufferTexture2D(GL_FRAMEBUFFER, glAttachment, glTextureTarget, depthTexture->getID(), 0));
+
+				// finalize..
+				// *This is a problem, if we wanted to have color texture attachments AND depth texture attachments
+				// on the same framebuffer..
+				GL_FUNC(glDrawBuffer(GL_NONE));
+				GL_FUNC(glReadBuffer(GL_NONE));
+
+				if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+				{
+					Debug::log(
+						"Location: void OpenglFramebuffer::createDepthAttachment()\n"
+						"Error occured while creating framebuffer color attachment.",
+						DEBUG__ERROR_LEVEL__ERROR
+					);
+				}
+
+				GL_FUNC(glBindTexture(glTextureTarget, 0)); // *Not sure is this required here
+				GL_FUNC(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+
+				_depthTexture = depthTexture;
+
+				return depthTexture;
+			}
 
 		}
 	}

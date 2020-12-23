@@ -1,7 +1,11 @@
 #pragma once
 
 #include "components/Component.h"
+#include "shadows/Shadows.h"
 #include "utils/myMathLib/MyMathLib.h"
+
+#define LIGHT_DEFAULT_NAME "Light"
+#define DIRECTIONAL_LIGHT_DEFAULT_NAME "DirectionalLight"
 
 namespace fungine
 {
@@ -14,8 +18,8 @@ namespace fungine
 			mml::Vector3 _ambientColor = mml::Vector3(0, 0, 0);
 
 		public:
-			Light(const mml::Vector3& color, const mml::Vector3& ambientColor, entities::Entity* entity) : 
-				Component(entity), _color(color), _ambientColor(ambientColor)
+			Light(const mml::Vector3& color, const mml::Vector3& ambientColor, const std::string& name = LIGHT_DEFAULT_NAME) : 
+				Component(name), _color(color), _ambientColor(ambientColor)
 			{}
 			virtual ~Light() {}
 
@@ -32,6 +36,8 @@ namespace fungine
 		private:
 			mml::Vector3 _direction = mml::Vector3(0, -1, -1);
 
+			DirectionalShadowCaster _shadowCaster;
+
 			// *->TEMP
 			static DirectionalLight* s_directionalLight;
 
@@ -40,12 +46,18 @@ namespace fungine
 				const mml::Vector3& direction,
 				const mml::Vector3& color,
 				const mml::Vector3& ambientColor,
-				entities::Entity* entity = nullptr
+				unsigned int shadowmapWidth, 
+				unsigned int shadowmapHeight,
+				const std::string& name = DIRECTIONAL_LIGHT_DEFAULT_NAME
 			);
 			~DirectionalLight();
 
+			virtual void update() override;
+
 			inline void setDirection(const mml::Vector3& dir) { _direction = dir; }
 			inline const mml::Vector3& getDirection() const { return _direction; }
+			
+			inline ShadowCaster& getShadowCaster() { return _shadowCaster; }
 
 			inline static DirectionalLight* get_directional_light() { return s_directionalLight; }
 

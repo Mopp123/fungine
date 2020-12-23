@@ -9,27 +9,35 @@ namespace fungine
 {
 	namespace graphics
 	{
+		// instantiate templates for buffers explicitly
+		template class VertexBuffer<float>;
+
 		// We allow VertexBuffer creation only through the function "create_vertex_buffer".
 		//	-> make operator new inaccessable for outsiders
-		void* VertexBuffer::operator new(size_t size)
+		template<typename T>
+		void* VertexBuffer<T>::operator new(size_t size)
 		{
 			return malloc(size);
 		}
 
-		VertexBuffer::VertexBuffer(const std::vector<float>& data, BufferUsage usage, const VertexBufferLayout& layout) :
-			_data(data), _layout(layout)
+		template<typename T>
+		VertexBuffer<T>::VertexBuffer(T* data, size_t dataSize, BufferUsage usage, const VertexBufferLayout& layout) :
+			_layout(layout)
 		{
+			_data = data;
+			_dataSize = dataSize;
 		}
 
-		VertexBuffer::~VertexBuffer()
+		template<typename T>
+		VertexBuffer<T>::~VertexBuffer()
 		{}
 
-
-		VertexBuffer* VertexBuffer::create_vertex_buffer(const std::vector<float>& data, BufferUsage usage, const VertexBufferLayout& layout)
+		template<typename T>
+		VertexBuffer<T>* VertexBuffer<T>::create_vertex_buffer(T* data, size_t dataSize, BufferUsage usage, const VertexBufferLayout& layout)
 		{
 			switch (Graphics::get_graphics_api())
 			{
-			case GraphicsAPI::OpenGL: return new opengl::OpenglVertexBuffer(data, usage, layout);
+			case GraphicsAPI::OpenGL: return new opengl::OpenglVertexBuffer<T>(data, dataSize, usage, layout);
 			default:
 				Debug::log(
 					"Location: VertexBuffer* VertexBuffer::create_vertex_buffer(const std::vector<float>& data, BufferUsage usage)\n"
@@ -41,7 +49,6 @@ namespace fungine
 
 			return nullptr;
 		}
-
 
 		IndexBuffer::IndexBuffer(const std::vector<unsigned int>& indices) :
 			_data(indices)

@@ -10,8 +10,14 @@ namespace fungine
 		namespace commonEntityFactory
 		{
 			Entity* create_entity__Camera(const mml::Vector3& pos, const mml::Quaternion& rot, const mml::Matrix4& projMat);
-			Entity* create_entity__DirectionalLight(const mml::Vector3& direction, const mml::Vector3& color, const mml::Vector3& ambientColor);
-
+			
+			Entity* create_entity__DirectionalLight(
+				const mml::Vector3& direction, 
+				const mml::Vector3& color, 
+				const mml::Vector3& ambientColor,
+				unsigned int shadowmapWidth = 0,
+				unsigned int shadowmapHeight = 0
+			);
 		}
 	}
 }

@@ -19,6 +19,15 @@ namespace fungine
 				delete _resolvedMultisampleFramebuffer;
 				_resolvedMultisampleFramebuffer = nullptr;
 			}
+
+			for (int i = 0; i < _colorAttachmentCount; i++)
+			{
+				if (_colorTextures[i])
+					delete _colorTextures[i];
+			}
+
+			if (_depthTexture)
+				delete _depthTexture;
 		}
 
 		Framebuffer* Framebuffer::create_framebuffer(int width, int height, bool isDefaultFramebuffer, int samples)

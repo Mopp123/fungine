@@ -35,6 +35,7 @@ namespace fungine
 
 			static RendererCommands* create_renderer_commands();
 
+			virtual void init() const = 0;
 			virtual void clear() const = 0;
 
 			virtual void bindMesh(const components::Mesh* const mesh) const = 0;

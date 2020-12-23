@@ -1,5 +1,6 @@
 
 #include <GLEW/glew.h>
+#include "core/Program.h"
 #include "OpenglRendererCommands.h"
 #include "core/Debug.h"
 
@@ -18,14 +19,22 @@ namespace fungine
 			OpenglRendererCommands::~OpenglRendererCommands()
 			{}
 
+			void OpenglRendererCommands::init() const
+			{
+				GL_FUNC(glEnable(GL_DEPTH_TEST));
+				if (core::Program::get_window()->getMSAASamples() > 0)
+				{
+					GL_FUNC(glEnable(GL_MULTISAMPLE));
+				}
+				clear();
+				GL_FUNC(glClearColor(_clearColor.x, _clearColor.y, _clearColor.z, _clearColor.w));
+			}
+
 			void OpenglRendererCommands::clear() const
 			{
 				// *TEMPORARY -> move this somewhere else in the future..
-				GL_FUNC(glEnable(GL_DEPTH_TEST));
-				GL_FUNC(glEnable(GL_MULTISAMPLE));
 				glEnable(GL_BLEND);
 				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-				GL_FUNC(glClearColor(_clearColor.x, _clearColor.y, _clearColor.z, _clearColor.w));
 				GL_FUNC(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 			}
 			void OpenglRendererCommands::bindMesh(const Mesh* const mesh) const
@@ -33,7 +42,7 @@ namespace fungine
 				GL_FUNC(glBindVertexArray(mesh->getAPISpecific_vaoID()));
 
 				// Enable required vertex attributes
-				for (const VertexBuffer* vb : mesh->getVertexBuffers())
+				for (const VertexBuffer<float>* vb : mesh->getVertexBuffers())
 				{
 					for (const VertexBufferElement& vbElem : vb->getLayout().getElements())
 						GL_FUNC(glEnableVertexAttribArray(vbElem.getSlot()));
@@ -42,7 +51,7 @@ namespace fungine
 			void OpenglRendererCommands::unbindMesh(const Mesh* const mesh) const
 			{
 				// Enable required vertex attributes
-				for (const VertexBuffer* vb : mesh->getVertexBuffers())
+				for (const VertexBuffer<float>* vb : mesh->getVertexBuffers())
 				{
 					for (const VertexBufferElement& vbElem : vb->getLayout().getElements())
 					{

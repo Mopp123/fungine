@@ -13,7 +13,8 @@ namespace fungine
 			Red,
 			Green,
 			Blue,
-			BGR
+			BGR,
+			Depth
 		};
 
 		enum class TextureDataType

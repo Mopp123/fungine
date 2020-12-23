@@ -15,13 +15,15 @@ namespace fungine
 	namespace components
 	{
 
-		Mesh::Mesh(std::vector<VertexBuffer*> vertexBuffers, IndexBuffer* indexBuffer, DrawType drawType, const std::string& name, entities::Entity* entity) :
-			Component(entity), _name(name), _vertexBuffers(vertexBuffers), _indexBuffer(indexBuffer), _drawType(drawType)
+		Mesh::Mesh(IndexBuffer* indexBuffer, DrawType drawType, unsigned int instanceCount, const std::string& name, bool isStatic) :
+			Component(name, isStatic), _instanceCount(instanceCount), _indexBuffer(indexBuffer), _drawType(drawType)
 		{}
 
 		Mesh::~Mesh()
 		{
-			for (VertexBuffer* vb : _vertexBuffers)
+			Debug::notify_on_destroy(_name + "(Mesh)");
+
+			for (VertexBuffer<float>* vb : _vertexBuffers)
 				delete vb;
 
 			delete _indexBuffer;
@@ -33,11 +35,11 @@ namespace fungine
 		}
 
 
-		std::shared_ptr<Mesh> Mesh::create_mesh(std::vector<VertexBuffer*> vertexBuffers, IndexBuffer* indexBuffer, DrawType drawType, const std::string& name)
+		std::shared_ptr<Mesh> Mesh::create_mesh(std::vector<VertexBuffer<float>*> vertexBuffers, IndexBuffer* indexBuffer, DrawType drawType, unsigned int instanceCount, const std::string& name, bool isStatic)
 		{
 			switch (Graphics::get_graphics_api())
 			{
-			case GraphicsAPI::OpenGL: return std::make_shared<opengl::OpenglMesh>(vertexBuffers, indexBuffer, drawType, name);
+			case GraphicsAPI::OpenGL: return std::make_shared<opengl::OpenglMesh>(vertexBuffers, indexBuffer, drawType, instanceCount, name, isStatic);
 			default:
 				Debug::log(
 					"Location: Mesh* Mesh::create_mesh(std::vector<VertexBuffer*> vertexBuffers, IndexBuffer* indexBuffer)\n"
@@ -49,5 +51,6 @@ namespace fungine
 
 			return nullptr;
 		}
+
 	}
 }

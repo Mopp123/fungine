@@ -11,33 +11,38 @@ namespace fungine
 	{
 		namespace opengl
 		{
+			template class OpenglVertexBuffer<float>;
 
-
-			OpenglVertexBuffer::OpenglVertexBuffer(const std::vector<float>& data, BufferUsage usage, const VertexBufferLayout& layout) :
-				VertexBuffer(data, usage, layout)
+			template<typename T>
+			OpenglVertexBuffer<T>::OpenglVertexBuffer(T* data, size_t dataSize, BufferUsage usage, const VertexBufferLayout& layout) :
+				VertexBuffer<T>(data, dataSize, usage, layout)
 			{
 				GLenum bufferUsage = GL_NONE;
 				convert_to_GLenum__buffer_usage(usage, bufferUsage);
 
-				GL_FUNC(glGenBuffers(1, &_id));
-				GL_FUNC(glBindBuffer(GL_ARRAY_BUFFER, _id));
+				GL_FUNC(glGenBuffers(1, &this->_id));
+				GL_FUNC(glBindBuffer(GL_ARRAY_BUFFER, this->_id));
 
-				GL_FUNC(glBufferData(GL_ARRAY_BUFFER, sizeof(float) * data.size(), &data[0], GL_STATIC_DRAW));
+				GL_FUNC(glBufferData(GL_ARRAY_BUFFER, dataSize, data, bufferUsage));
 
 				GL_FUNC(glBindBuffer(GL_ARRAY_BUFFER, 0));
 			}
 
-			OpenglVertexBuffer::~OpenglVertexBuffer()
+			template<typename T>
+			OpenglVertexBuffer<T>::~OpenglVertexBuffer()
 			{
-				glDeleteBuffers(1, &_id);
+				glDeleteBuffers(1, &this->_id);
 				Debug::notify_on_destroy("OpenglVertexBuffer");
 			}
 
 			// Updates the buffer starting from "offset" with new data
-			void OpenglVertexBuffer::update(unsigned int offset, const std::vector<float>& data)
+			// Mesh which owns this buffer, must be bound when calling this.
+			template<typename T>
+			void OpenglVertexBuffer<T>::update(int offset, size_t dataSize, const void* data)
 			{
+				glBindBuffer(GL_ARRAY_BUFFER, this->_id);
+				glBufferSubData(GL_ARRAY_BUFFER, offset, dataSize, data);
 			}
-
 
 			OpenglIndexBuffer::OpenglIndexBuffer(const std::vector<unsigned int>& data) :
 				IndexBuffer(data)

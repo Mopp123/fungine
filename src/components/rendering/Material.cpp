@@ -20,9 +20,9 @@ namespace fungine
 		Material::Material(
 			graphics::ShaderProgram* shader,
 			const std::vector<graphics::Texture*>& textures,
-			entities::Entity* entity
+			const std::string& name
 		) :
-			Component(entity)
+			Component(name)
 		{
 			_shader = shader;
 			for (int i = 0; i < textures.size(); ++i)
@@ -49,9 +49,9 @@ namespace fungine
 		Material::Material(
 			graphics::ShaderProgram* shader,
 			const std::vector<std::pair<std::string, graphics::Texture*>>& textures,
-			entities::Entity* entity
+			const std::string& name
 		) :
-			Component(entity)
+			Component(name)
 		{
 			_shader = shader;
 			for (int i = 0; i < textures.size(); ++i)
@@ -88,8 +88,9 @@ namespace fungine
 
 		Material::~Material()
 		{
-			Debug::notify_on_destroy("Material");
+			Debug::notify_on_destroy(_name + "(Material)");
 		}
+
 
 		template void Material::addUniform<int>(graphics::ShaderUniform<int>& uniform);
 		template void Material::addUniform<mml::IVector2>(graphics::ShaderUniform<mml::IVector2>& uniform);
@@ -182,18 +183,20 @@ namespace fungine
 
 		std::shared_ptr<Material> Material::create_material__default3D(
 			graphics::ShaderProgram* shader,
-			const std::vector<graphics::Texture*>& textures
+			const std::vector<graphics::Texture*>& textures,
+			const std::string& name
 		)
 		{
-			return std::make_shared<Material>(shader, textures);
+			return std::make_shared<Material>(shader, textures, name);
 		}
 
 		std::shared_ptr<Material> Material::create_material__default3D(
 			graphics::ShaderProgram* shader,
-			const std::vector<std::pair<std::string, graphics::Texture*>>& textures
+			const std::vector<std::pair<std::string, graphics::Texture*>>& textures,
+			const std::string& name
 		)
 		{
-			return std::make_shared<Material>(shader, textures);
+			return std::make_shared<Material>(shader, textures, name);
 		}
 	}
 }

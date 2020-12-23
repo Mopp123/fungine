@@ -18,7 +18,8 @@ namespace mml
 		float x = 0.0f;
 		float y = 0.0f;
 		float z = 0.0f;
-		
+
+		Vector3() {}
 		Vector3(float X, float Y, float Z);
 		
 		float magnitude() const;

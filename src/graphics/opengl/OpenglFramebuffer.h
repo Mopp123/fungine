@@ -15,7 +15,7 @@ namespace fungine
 				~OpenglFramebuffer();
 
 				virtual Texture* addColorAttachment() override;
-				virtual void createDepthAttachment() override;
+				virtual Texture* createDepthAttachment() override;
 			};
 		}
 	}

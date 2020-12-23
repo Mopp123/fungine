@@ -35,7 +35,7 @@ namespace fungine
 				return;
 			}
 
-			glfwWindowHint(GLFW_SAMPLES, MSAASamples);
+			if(MSAASamples > 0) glfwWindowHint(GLFW_SAMPLES, MSAASamples);
 			glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, DEFAULT__OPENGL_VERSION_MAJOR);
 			glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, DEFAULT__OPENGL_VERSION_MINOR);
 			glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);

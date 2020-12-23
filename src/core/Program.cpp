@@ -15,10 +15,10 @@ namespace fungine
 
 		std::unique_ptr<Window> Program::_window = nullptr;
 
-		Program::Program(const std::string& windowTitle, int windowWidth, int windowHeight)
+		Program::Program(const std::string& windowTitle, int windowWidth, int windowHeight, bool fullscreen)
 		{
 			graphics::Graphics::set_graphics_api(graphics::GraphicsAPI::OpenGL);
-			_window = Window::create_window(windowTitle.c_str(), windowWidth, windowHeight, 1, 1);
+			_window = Window::create_window(windowTitle.c_str(), windowWidth, windowHeight, 1, 1, fullscreen);
 			
 			// This is fucking retarded..
 			_window->createInputMapping();
@@ -38,15 +38,15 @@ namespace fungine
 		void Program::update()
 		{
 			// !!!!!!!!!!!!!! This is just temporarely here !!!!!!!!!!!!!!!!!! *->TEMP
-			for (Component* c : Component::s_allComponentsPool)
+			for (Component* c : Component::s_allComponentsPool) // *NOTE: remember the "pointer invalidation shit thing" if u try to access this vector, if it has changed in this update at some point.. then all those pointers are inaccessable..
 			{
+				size_t dynamicComponentCount = Component::s_allComponentsPool.size();
 				if (c)
 				{
 					if (c->_isActive)
 						c->update();
 				}
 			}
-
 			_window->swapBuffers();
 			_window->updateEvents();
 			Time::update();

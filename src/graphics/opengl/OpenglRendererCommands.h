@@ -32,13 +32,14 @@ default :									storage = GL_NONE;				break;	\
 }
 
 #define convert_to_GLenum__texture_format(format, storage) switch(format){\
-case graphics::TextureFormat::RGB :		storage = GL_RGB;	break;	\
-case graphics::TextureFormat::RGBA :	storage = GL_RGBA;	break;	\
-case graphics::TextureFormat::Red :		storage = GL_RED;	break;	\
-case graphics::TextureFormat::Green :	storage = GL_GREEN;	break;	\
-case graphics::TextureFormat::Blue :	storage = GL_BLUE;	break;	\
-case graphics::TextureFormat::BGR :		storage = GL_BGR;	break;	\
-default :								storage = GL_NONE;	break;	\
+case graphics::TextureFormat::RGB :		storage = GL_RGB;				break;	\
+case graphics::TextureFormat::RGBA :	storage = GL_RGBA;				break;	\
+case graphics::TextureFormat::Red :		storage = GL_RED;				break;	\
+case graphics::TextureFormat::Green :	storage = GL_GREEN;				break;	\
+case graphics::TextureFormat::Blue :	storage = GL_BLUE;				break;	\
+case graphics::TextureFormat::BGR :		storage = GL_BGR;				break;	\
+case graphics::TextureFormat::Depth :	storage = GL_DEPTH_COMPONENT;	break;	\
+default :								storage = GL_NONE;				break;	\
 }
 
 #define convert_to_GLenum__texture_data_type(type, storage) switch(type){\
@@ -104,6 +105,7 @@ namespace fungine
 				OpenglRendererCommands();
 				~OpenglRendererCommands();
 
+				virtual void init() const override;
 				virtual void clear() const override;
 
 				virtual void bindMesh(const components::Mesh* const mesh) const override;

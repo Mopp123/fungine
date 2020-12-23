@@ -1,5 +1,6 @@
 #pragma once
 
+#include "utils/myMathLib/MyMathLib.h"
 #include "core/Common.h"
 #include <string>
 
@@ -21,6 +22,9 @@ namespace fungine
 		~ImageData();
 
 		static ImageData* load_image(const std::string& path, bool flipY = false);
+
+		void setColor(int x, int y, byte r, byte g, byte b, byte a);
+		byte getColorChannel(int x, int y, unsigned int channel) const;
 
 		inline const byte* getData() const { return _data; }
 		inline const int getWidth() const { return _width; }
