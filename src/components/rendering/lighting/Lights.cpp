@@ -42,7 +42,7 @@ namespace fungine
 			_shadowCaster.update();
 		}
 
-		const mml::Vector3& DirectionalLight::getDirection() const
+		mml::Vector3 DirectionalLight::getDirection() const
 		{
 			return _entity->getComponent<Transform>()->forward();
 		}

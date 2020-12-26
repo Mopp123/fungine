@@ -53,7 +53,7 @@ namespace fungine
 
 			virtual void update() override;
 
-			const mml::Vector3& getDirection() const;
+			mml::Vector3 getDirection() const;
 			
 			inline ShadowCaster& getShadowCaster() { return _shadowCaster; }
 

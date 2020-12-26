@@ -20,7 +20,8 @@ namespace fungine
 		namespace rendering
 		{
 
-			NatureRenderer::NatureRenderer()
+			NatureRenderer::NatureRenderer(bool renderShadows) :
+				Renderer(renderShadows)
 			{
 				if (!s_framebuffer)
 					s_framebuffer = Framebuffer::create_framebuffer(core::Window::get_width(), core::Window::get_height(), true);
@@ -40,15 +41,46 @@ namespace fungine
 				}
 			}
 
+			void NatureRenderer::submit(Entity* entity)
+			{
+				std::shared_ptr<Mesh> mesh = entity->getComponent<Mesh>();
+				std::shared_ptr<Material> material = entity->getComponent<Material>();
+
+				bool createNewMeshCpy = false;
+				for (std::pair<std::shared_ptr<Mesh>, std::shared_ptr<BatchData>>& batch : _batches)
+				{
+					if (batch.first == mesh)
+					{
+						if (batch.second->instanceCount < batch.first->getInstanceCount())
+						{
+							addToBatch(entity, *batch.second);
+							return;
+						}
+						else
+						{
+							createNewMeshCpy = true;
+						}
+					}
+				}
+
+				createNewBatch(entity, material, mesh, createNewMeshCpy);
+			}
+
 			void NatureRenderer::flush(
 				const mml::Matrix4& projectionMatrix,
-				const mml::Matrix4& viewMatrix
+				const mml::Matrix4& viewMatrix,
+				unsigned int renderFlags
 			)
 			{
 				const RendererCommands* rendererCommands = Graphics::get_renderer_commands();
 				Camera* camera = Camera::get_current_camera();
 				DirectionalLight* directionalLight = DirectionalLight::get_directional_light();
-				
+
+				bool renderGeometry = true;
+				bool renderMaterial = renderFlags & RenderFlags::RenderMaterial;
+				bool renderLighting = renderFlags & RenderFlags::RenderLighting;
+				bool renderShadows =  renderFlags & RenderFlags::RenderShadows;
+
 #ifdef DEBUG__MODE_FULL
 				if (!camera)
 				{
@@ -68,31 +100,23 @@ namespace fungine
 
 					ShaderProgram* shader = material->getShader();
 
-					rendererCommands->bindMaterial(material);
-
-					// "bind texture units"
-					shader->setUniform("texture_diffuse", 0);
-
-					if (material->hasSpecularMap())
-						shader->setUniform("texture_specular", 1);
-
-					if (material->hasNormalMap())
-						shader->setUniform("texture_normal", 2);
-
+					renderMaterial ? setMaterialUniforms(rendererCommands, material, shader) : shader->bind();
 
 					float aspectRatio = (float)(core::Window::get_width()) / (float)(core::Window::get_height());
 					mml::Matrix4 projMat(1.0f);
 					mml::create_perspective_projection_matrix(projMat, 70.0f, aspectRatio, 0.1f, 2.5f);
+					
 					// common uniforms
 					shader->setUniform("projectionMatrix", projectionMatrix);
 					shader->setUniform("viewMatrix", viewMatrix);
 					shader->setUniform("cameraPos", camera->getEntity()->getComponent<Transform>()->getPosition());
-					shader->setUniform("directionalLight_direction", directionalLight->getDirection());
-					shader->setUniform("directionalLight_ambientColor", directionalLight->getAmbientColor());
-					shader->setUniform("directionalLight_color", directionalLight->getColor());
+					
+					// Set lighting uniforms
+					if (renderLighting) setLightingUniforms(shader, directionalLight);
+					// Set shadowing uniforms
+					if (renderShadows)	setShadowUniforms(rendererCommands, shader, directionalLight->getShadowCaster());
 
 					shader->setUniform("time", (float)Time::get_time());
-
 					shader->setUniform("isTwoSided", (int)material->isTwoSided());
 
 					// Finally drawing..
@@ -120,8 +144,7 @@ namespace fungine
 					rendererCommands->drawIndices_instanced(mesh);
 					rendererCommands->unbindMesh(mesh);
 
-					rendererCommands->unbindMaterial(material);
-
+					renderMaterial ? rendererCommands->unbindMaterial(material) : shader->unbind();
 				}
 			}
 
@@ -129,33 +152,42 @@ namespace fungine
 			{
 			}
 
-
-			void NatureRenderer::submit(Entity* entity)
+			void NatureRenderer::setMaterialUniforms(
+				const graphics::RendererCommands* rendererCommands,
+				Material* material,
+				graphics::ShaderProgram* shader
+			) const
 			{
-				std::shared_ptr<Mesh> mesh = entity->getComponent<Mesh>();
-				std::shared_ptr<Material> material = entity->getComponent<Material>();
 
-				bool createNewMeshCpy = false;
-				for (std::pair<std::shared_ptr<Mesh>, std::shared_ptr<BatchData>>& batch : _batches)
-				{
-					if (batch.first == mesh)
-					{
-						if (batch.second->instanceCount < batch.first->getInstanceCount())
-						{
-							addToBatch(entity, *batch.second);
-							return;
-						}
-						else
-						{
-							createNewMeshCpy = true;
-						}
-					}
-				}
-				
-				createNewBatch(entity, material, mesh, createNewMeshCpy);
+				rendererCommands->bindMaterial(material);
+
+				// "bind texture units"
+				shader->setUniform("texture_diffuse", 0);
+
+				if (material->hasSpecularMap())
+					shader->setUniform("texture_specular", 1);
+
+				if (material->hasNormalMap())
+					shader->setUniform("texture_normal", 2);
 			}
 
-			
+			void NatureRenderer::setLightingUniforms(
+				graphics::ShaderProgram* shader,
+				const DirectionalLight* directionalLight
+			) const
+			{
+				shader->setUniform("directionalLight_direction", directionalLight->getDirection());
+				shader->setUniform("directionalLight_ambientColor", directionalLight->getAmbientColor());
+				shader->setUniform("directionalLight_color", directionalLight->getColor());
+			}
+
+			void NatureRenderer::setShadowUniforms(
+				const graphics::RendererCommands* rendererCommands,
+				graphics::ShaderProgram* shader,
+				ShadowCaster& shadowCaster
+			) const
+			{}
+
 			void NatureRenderer::createNewBatch(entities::Entity* entity, std::shared_ptr<Material>& material, std::shared_ptr<Mesh>& mesh, bool createMeshCpy)
 			{
 				printf("Creating new batch!\n");
@@ -261,11 +293,6 @@ namespace fungine
 				}
 			}
 
-			void NatureRenderer::renderToShadowmap()
-			{}
-			
-			void NatureRenderer::renderToScreen()
-			{}
 
 			const size_t NatureRenderer::getSize() const
 			{

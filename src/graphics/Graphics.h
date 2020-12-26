@@ -30,6 +30,8 @@ namespace fungine
 			inline static GraphicsAPI get_graphics_api() { return s_graphicsAPI; }
 			inline static void set_graphics_api(GraphicsAPI api) { s_graphicsAPI = api; }
 			inline static RendererCommands* const get_renderer_commands() { return s_rendererCommands; }
+		
+		private:
 		};
 	}
 }

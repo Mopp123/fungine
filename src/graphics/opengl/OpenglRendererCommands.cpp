@@ -157,7 +157,7 @@ namespace fungine
 			void OpenglRendererCommands::bindFramebuffer(const Framebuffer* const framebuffer) const
 			{
 				GL_FUNC(glBindFramebuffer(GL_FRAMEBUFFER, framebuffer->getID()));
-				GL_FUNC(glViewport(0, 0, Window::get_width(), Window::get_height()));
+				GL_FUNC(glViewport(0, 0, framebuffer->getWidth(), framebuffer->getHeight()));
 			}
 			void OpenglRendererCommands::unbindFramebuffer(const Framebuffer* const framebuffer) const
 			{

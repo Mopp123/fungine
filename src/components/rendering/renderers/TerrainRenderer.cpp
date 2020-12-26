@@ -19,7 +19,8 @@ namespace fungine
 		namespace rendering
 		{
 
-			TerrainRenderer::TerrainRenderer()
+			TerrainRenderer::TerrainRenderer(bool renderShadows) : 
+				Renderer(renderShadows)
 			{
 				if (!s_framebuffer)
 					s_framebuffer = Framebuffer::create_framebuffer(core::Window::get_width(), core::Window::get_height(), true);
@@ -48,12 +49,18 @@ namespace fungine
 
 			void TerrainRenderer::flush(
 				const mml::Matrix4& projectionMatrix,
-				const mml::Matrix4& viewMatrix
+				const mml::Matrix4& viewMatrix,
+				unsigned int renderFlags
 			)
 			{
 				const RendererCommands* rendererCommands = Graphics::get_renderer_commands();
 				Camera* camera = Camera::get_current_camera();
 				DirectionalLight* directionalLight = DirectionalLight::get_directional_light();
+
+				bool renderGeometry = true;
+				bool renderMaterial = renderFlags & RenderFlags::RenderMaterial;
+				bool renderLighting = renderFlags & RenderFlags::RenderLighting;
+				bool renderShadows =  renderFlags & RenderFlags::RenderShadows;
 
 #ifdef DEBUG__MODE_FULL
 				if (!camera)
@@ -71,26 +78,17 @@ namespace fungine
 					Material* material = batch.first.get();
 					ShaderProgram* shader = material->getShader();
 
-					rendererCommands->bindMaterial(material);
+					// Either bind the material or just plain shader
+					// (RendererCommands::bindMaterial(Material*) also binds the material's shader!)
+					renderMaterial ? setMaterialUniforms(rendererCommands, material, shader) : shader->bind();
 
 					// common uniforms
 					shader->setUniform("projectionMatrix", projectionMatrix);
 					shader->setUniform("viewMatrix", viewMatrix);
 					shader->setUniform("cameraPos", camera->getEntity()->getComponent<Transform>()->getPosition());
-					shader->setUniform("directionalLight_direction", directionalLight->getDirection());
-					shader->setUniform("directionalLight_ambientColor", directionalLight->getAmbientColor());
-					shader->setUniform("directionalLight_color", directionalLight->getColor());
 
-
-					// JUST TESTING
-					// Shadowing uniforms
-					ShadowCaster& shadowCaster = directionalLight->getShadowCaster();
-					shader->setUniform("shadowProjMat", shadowCaster.getProjectionMatrix());
-					shader->setUniform("shadowViewMat", shadowCaster.getViewMatrix());
-
-					shader->setUniform("texture_shadowmap", 14);
-
-					rendererCommands->bindTexture(shadowCaster.getShadowmapTexture(), 14);
+					if (renderLighting) setLightingUniforms(shader, directionalLight);
+					if (renderShadows)	setShadowUniforms(rendererCommands, shader, directionalLight->getShadowCaster());
 
 					// per entity inside the batch
 					for (Entity* e : batch.second)
@@ -105,7 +103,8 @@ namespace fungine
 						rendererCommands->unbindMesh(mesh.get());
 					}
 
-					rendererCommands->unbindMaterial(material);
+					// Unbind the batch's shit..
+					renderMaterial ? rendererCommands->unbindMaterial(material) : shader->unbind();
 				}
 			}
 
@@ -113,6 +112,40 @@ namespace fungine
 			void TerrainRenderer::clear()
 			{
 				_batches.clear();
+			}
+
+
+			void TerrainRenderer::setMaterialUniforms(
+				const RendererCommands* rendererCommands, 
+				Material* material,
+				graphics::ShaderProgram* shader
+			) const
+			{
+				rendererCommands->bindMaterial(material);
+			}
+
+			void TerrainRenderer::setLightingUniforms(
+				graphics::ShaderProgram* shader, 
+				const DirectionalLight* directionalLight
+			) const
+			{
+				shader->setUniform("directionalLight_direction", directionalLight->getDirection());
+				shader->setUniform("directionalLight_ambientColor", directionalLight->getAmbientColor());
+				shader->setUniform("directionalLight_color", directionalLight->getColor());
+			}
+
+			void TerrainRenderer::setShadowUniforms(
+				const RendererCommands* rendererCommands,
+				graphics::ShaderProgram* shader, 
+				ShadowCaster& shadowCaster
+			) const
+			{
+				shader->setUniform("shadowProjMat", shadowCaster.getProjectionMatrix());
+				shader->setUniform("shadowViewMat", shadowCaster.getViewMatrix());
+
+				shader->setUniform("texture_shadowmap", 14);
+
+				rendererCommands->bindTexture(shadowCaster.getShadowmapTexture(), 14);
 			}
 
 			const size_t TerrainRenderer::getSize() const

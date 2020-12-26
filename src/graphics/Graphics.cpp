@@ -40,15 +40,18 @@ namespace fungine
 			
 			s_rendererCommands->bindFramebuffer(shadowmapFramebuffer);
 			s_rendererCommands->clear();
-			bool first = true;
+
 			for (Renderer* renderer : Renderer::get_all_renderers())
 			{
-				if (first)
+				if (renderer->rendersShadows())
 				{
-					first = false;
-					continue;
+					renderer->flush(
+						shadowCaster.getProjectionMatrix(),
+						shadowCaster.getViewMatrix(),
+						RenderFlags::RenderGeometry |
+						RenderFlags::RenderMaterial
+					);
 				}
-				renderer->flush(shadowCaster.getProjectionMatrix(), shadowCaster.getViewMatrix());
 			}
 			// Render to screen
 			Framebuffer* screenFramebuffer = Renderer::get_screen_framebuffer();
@@ -56,7 +59,15 @@ namespace fungine
 			s_rendererCommands->bindFramebuffer(screenFramebuffer);
 			s_rendererCommands->clear();
 			for (Renderer* renderer : Renderer::get_all_renderers())
-				renderer->flush(camera->getProjectionMatrix(), camera->getViewMatrix());
+				renderer->flush(
+					camera->getProjectionMatrix(),
+					camera->getViewMatrix(),
+					RenderFlags::RenderGeometry |
+					RenderFlags::RenderMaterial |
+					RenderFlags::RenderLighting |
+					RenderFlags::RenderShadows
+				);
+
 
 			// Finally clear all renderers.. (currently this clears all dynamic renderLists/batches of the renderers..)
 			for (Renderer* renderer : Renderer::get_all_renderers())

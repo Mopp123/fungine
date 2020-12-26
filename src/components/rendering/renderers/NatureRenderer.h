@@ -46,7 +46,7 @@ namespace fungine
 				bool _lockSubmitting = false;
 
 			public:
-				NatureRenderer();
+				NatureRenderer(bool renderShadows = false);
 				~NatureRenderer();
 
 				virtual void update() override;
@@ -55,13 +55,34 @@ namespace fungine
 
 				virtual void flush(
 					const mml::Matrix4& projectionMatrix,
-					const mml::Matrix4& viewMatrix
+					const mml::Matrix4& viewMatrix,
+					unsigned int renderFlags
 				) override;
 
 				virtual void clear() override;
 
 
 				virtual const size_t getSize() const override;
+
+			protected:
+
+				virtual void setMaterialUniforms(
+					const graphics::RendererCommands* rendererCommands,
+					Material* material,
+					graphics::ShaderProgram* shader
+				) const override;
+
+				virtual void setLightingUniforms(
+					graphics::ShaderProgram* shader,
+					const DirectionalLight* directionalLight
+				) const override;
+
+				virtual void setShadowUniforms(
+					const graphics::RendererCommands* rendererCommands,
+					graphics::ShaderProgram* shader,
+					ShadowCaster& shadowCaster
+				) const override;
+
 			private:
 
 				void createNewBatch(entities::Entity* entity, std::shared_ptr<Material>& material, std::shared_ptr<Mesh>& mesh, bool createMeshCpy);
@@ -70,8 +91,6 @@ namespace fungine
 				void addToTransformsBuff(BatchData& batch, const mml::Matrix4& transformationMatrix);
 				void addToWindInitValsBuff(BatchData& batch);
 
-				void renderToShadowmap();
-				void renderToScreen();
 			};
 		}
 	}

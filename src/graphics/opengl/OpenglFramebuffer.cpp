@@ -125,6 +125,10 @@ namespace fungine
 					TextureWrapping::ClampToBorder, TextureWrapping::ClampToBorder,
 					TextureFiltering::Nearest, TextureFiltering::Nearest
 				);
+				// *->TEMP : quicky hack borders of the texture to white..
+				float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+				GL_FUNC(glBindTexture(GL_TEXTURE_2D, depthTexture->getID()));
+				GL_FUNC(glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor));
 
 				GLenum glTextureTarget = GL_TEXTURE_2D;
 				GLenum glAttachment = GL_DEPTH_ATTACHMENT;

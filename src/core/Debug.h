@@ -12,7 +12,7 @@
 
 // Debug modes(Only one can be defined at a time):
 	// Enables all debug stuff
-		//#define DEBUG__MODE_FULL
+		#define DEBUG__MODE_FULL
 
 	// Enables only required debug stuff (disables graphics api related debug stuff..)
 		//#define DEBUG__MODE_NONE
