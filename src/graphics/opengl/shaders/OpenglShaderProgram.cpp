@@ -69,6 +69,14 @@ namespace fungine
 				_fragmentShader = validate_shader_type(pixelShader, ShaderStageType::PixelShader);
 				_geometryShader = validate_shader_type(geometryShader, ShaderStageType::GeometryShader);
 
+				// Find all uniforms from the shaders' source codes..
+				std::vector<std::pair<std::string, ModifyableUniform>> uniforms_vertexShader = _vertexShader->findModifyableUniforms();
+				std::vector<std::pair<std::string, ModifyableUniform>> uniforms_fragmentShader = _fragmentShader->findModifyableUniforms();
+				
+				_modifyableUniforms.reserve(uniforms_vertexShader.size() + uniforms_fragmentShader.size());
+				_modifyableUniforms.insert(_modifyableUniforms.end(), uniforms_vertexShader.begin(), uniforms_vertexShader.end());
+				_modifyableUniforms.insert(_modifyableUniforms.end(), uniforms_fragmentShader.begin(), uniforms_fragmentShader.end());
+
 				if (_vertexShader)		GL_FUNC(glAttachShader(_id, _vertexShader->getID()));
 				if (_fragmentShader)	GL_FUNC(glAttachShader(_id, _fragmentShader->getID()));
 				if (_geometryShader)	GL_FUNC(glAttachShader(_id, _geometryShader->getID()));
@@ -111,8 +119,23 @@ namespace fungine
 					return uniformLocation;
 				}
 			}
+			
+			bool OpenglShaderProgram::hasUniformLocation(const std::string& name) const
+			{
+				// If this uniform name is already in cache -> return its' location
+				if (_uniformCache.find(name) != _uniformCache.end())
+				{
+					return true;
+				}
+				
+				int uniformLocation = GL_FUNC(glGetUniformLocation(_id, name.c_str()));
+				if (uniformLocation != -1)
+					return true;
+				
+				return false;
+			}
 
-			void OpenglShaderProgram::setUniform(int location, int val) const
+			void OpenglShaderProgram::setUniform(int location, const int& val) const
 			{
 				GL_FUNC(glUniform1i(location, val));
 			}
@@ -128,7 +151,7 @@ namespace fungine
 			{
 				GL_FUNC(glUniform4i(location, val.x, val.y, val.z, val.w));
 			}
-			void OpenglShaderProgram::setUniform(int location, float val) const
+			void OpenglShaderProgram::setUniform(int location, const float& val) const
 			{
 				GL_FUNC(glUniform1f(location, val));
 			}
@@ -149,11 +172,23 @@ namespace fungine
 				GL_FUNC(glUniformMatrix4fv(location, 1, GL_FALSE, &m[0]));
 			}
 
-			void OpenglShaderProgram::setUniform(const std::string& location, int val)
+			void OpenglShaderProgram::setUniform(const std::string& location, const int& val)
 			{
 				GL_FUNC(glUniform1i(getUniformLocation(location), val));
 			}
-			void OpenglShaderProgram::setUniform(const std::string& location, float val)
+			void OpenglShaderProgram::setUniform(const std::string& location, const mml::IVector2& val)
+			{
+				GL_FUNC(glUniform2i(getUniformLocation(location), val.x, val.y));
+			}
+			void OpenglShaderProgram::setUniform(const std::string& location, const mml::IVector3& val)
+			{
+				GL_FUNC(glUniform3i(getUniformLocation(location), val.x, val.y, val.z));
+			}
+			void OpenglShaderProgram::setUniform(const std::string& location, const mml::IVector4& val)
+			{
+				GL_FUNC(glUniform4i(getUniformLocation(location), val.x, val.y, val.z, val.w));
+			}
+			void OpenglShaderProgram::setUniform(const std::string& location, const float& val)
 			{
 				GL_FUNC(glUniform1f(getUniformLocation(location), val));
 			}
@@ -174,18 +209,8 @@ namespace fungine
 				GL_FUNC(glUniformMatrix4fv(getUniformLocation(location), 1, GL_FALSE, &m[0]));
 			}
 
-			void OpenglShaderProgram::bind()
-			{
-				glUseProgram(_id);
-			}
-			void OpenglShaderProgram::unbind()
-			{
-				glUseProgram(0);
-			}
 			void OpenglShaderProgram::cleanUp()
 			{
-				unbind();
-
 				if (_vertexShader)		glDetachShader(_id, _vertexShader->getID());
 				if (_fragmentShader)	glDetachShader(_id, _fragmentShader->getID());
 				if (_geometryShader)	glDetachShader(_id, _geometryShader->getID());

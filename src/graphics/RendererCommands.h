@@ -3,6 +3,7 @@
 #include "utils/myMathLib/MyMathLib.h" 
 #include "Framebuffer.h"
 
+#include "graphics/shaders/ShaderProgram.h"
 #include "components/rendering/Mesh.h"
 #include "components/rendering/Material.h"
 
@@ -17,6 +18,13 @@ namespace fungine
 			Lines,
 			LineLoop,
 			Points
+		};
+
+		enum class CullFace
+		{
+			None,
+			Front,
+			Back
 		};
 
 		class RendererCommands
@@ -38,8 +46,11 @@ namespace fungine
 			virtual void init() const = 0;
 			virtual void clear() const = 0;
 
-			virtual void bindTexture(Texture* texture, unsigned int slot) const = 0;
-			virtual void unbindTexture() const = 0;
+			virtual void bindShader(ShaderProgram* shader) const = 0;
+			virtual void unbindShader() const = 0; // kind of pointless?
+			virtual void cullFace(CullFace face) const = 0;
+			virtual void bindTexture(const Texture* texture, unsigned int slot) const = 0;
+			virtual void unbindTexture(const Texture* texture, unsigned int slot) const = 0;
 			virtual void bindMesh(const components::Mesh* const mesh) const = 0;
 			virtual void unbindMesh(const components::Mesh* const mesh) const = 0;
 			virtual void drawIndices(const components::Mesh* const mesh) const = 0;

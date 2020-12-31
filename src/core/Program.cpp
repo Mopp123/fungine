@@ -18,7 +18,7 @@ namespace fungine
 		Program::Program(const std::string& windowTitle, int windowWidth, int windowHeight, bool fullscreen)
 		{
 			graphics::Graphics::set_graphics_api(graphics::GraphicsAPI::OpenGL);
-			_window = Window::create_window(windowTitle.c_str(), windowWidth, windowHeight, 1, 1, fullscreen);
+			_window = Window::create_window(windowTitle.c_str(), windowWidth, windowHeight, 1, 2, fullscreen);
 			
 			// This is fucking retarded..
 			_window->createInputMapping();

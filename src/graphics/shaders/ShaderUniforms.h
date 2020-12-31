@@ -2,6 +2,7 @@
 
 #include "utils/myMathLib/MyMathLib.h"
 #include <string>
+#include <vector>
 
 namespace fungine
 {
@@ -12,77 +13,84 @@ namespace fungine
 
 	namespace graphics
 	{
-
-		enum class UniformDataType
-		{
-			None,
-
-			Float,
-			Float2,
-			Float3,
-			Float4,
-
-			Int,
-			Int2,
-			Int3,
-			Int4,
-
-			Mat4
-		};
+		enum class ShaderDataType;
+		
 
 		template<typename T>
-		class ShaderUniform
+		struct ShaderUniform
+		{
+			std::string name = "None";
+			int location = -1;
+			ShaderDataType type = ShaderDataType::None;
+			T data;
+
+			ShaderUniform()
+			{}
+
+			ShaderUniform(const ShaderUniform<T>& uniform) :
+				name(uniform.name), location(uniform.location), type(uniform.type), data(uniform.data)
+			{}
+
+			ShaderUniform(const std::string& name, int location, ShaderDataType type) :
+				name(name), type(type), location(location)
+			{}
+
+			ShaderUniform(const std::string& name, ShaderDataType type, T value) :
+				name(name), type(type), data(value)
+			{}
+		};
+
+		class UniformList
 		{
 		private:
-			int _location = -1;
-			std::string _name;
 
-			T* _data;
+			std::vector<ShaderUniform<int>> _uniforms_Int;
+			std::vector<ShaderUniform<mml::IVector2>> _uniforms_Int2;
+			std::vector<ShaderUniform<mml::IVector3>> _uniforms_Int3;
+			std::vector<ShaderUniform<mml::IVector4>> _uniforms_Int4;
+
+			std::vector<ShaderUniform<float>> _uniforms_Float;
+			std::vector<ShaderUniform<mml::Vector2>> _uniforms_Float2;
+			std::vector<ShaderUniform<mml::Vector3>> _uniforms_Float3;
+			std::vector<ShaderUniform<mml::Vector4>> _uniforms_Float4;
+
+			std::vector<ShaderUniform<mml::Matrix4>> _uniforms_Matrix4;
+
+			std::vector<ShaderUniform<int>> _uniforms_Texture2D;
 
 			friend class components::Material;
+			friend class ShaderProgram;
 
 		public:
 
-			ShaderUniform(const ShaderUniform<T>& uniform) :
-				_location(uniform._location), _name(uniform._name), _data(uniform._data)
-			{}
+			inline const std::vector<ShaderUniform<int>>& getUniforms_Int() const { return _uniforms_Int; }
+			inline const std::vector<ShaderUniform<mml::IVector2>>& getUniforms_Int2() const { return _uniforms_Int2; }
+			inline const std::vector<ShaderUniform<mml::IVector3>>& getUniforms_Int3() const { return _uniforms_Int3; }
+			inline const std::vector<ShaderUniform<mml::IVector4>>& getUniforms_Int4() const { return _uniforms_Int4; }
 
-			ShaderUniform(const std::string& name, T* ptrToValue) :
-				_name(name), _data(ptrToValue)
-			{}
+			inline const std::vector<ShaderUniform<float>>& getUniforms_Float() const { return _uniforms_Float; }
+			inline const std::vector<ShaderUniform<mml::Vector2>>& getUniforms_Float2() const { return _uniforms_Float2; }
+			inline const std::vector<ShaderUniform<mml::Vector3>>& getUniforms_Float3() const { return _uniforms_Float3; }
+			inline const std::vector<ShaderUniform<mml::Vector4>>& getUniforms_Float4() const { return _uniforms_Float4; }
 
-			inline void setLocation(int location) { _location = location; }
-			inline const int& getLocation() const { return _location; }
-			inline const std::string& getName() const { return _name; }
+			inline const std::vector<ShaderUniform<mml::Matrix4>>& getUniforms_Matrix4() const { return _uniforms_Matrix4; }
 
-			inline const T* const getData() const { return _data; }
-		};
+			inline const std::vector<ShaderUniform<int>>& getUniforms_Texture2D() const { return _uniforms_Texture2D; }
 
-		struct ShaderUniformList
-		{
-			std::vector<ShaderUniform<int>> uniforms_int;
-			std::vector<ShaderUniform<mml::IVector2>> uniforms_int2;
-			std::vector<ShaderUniform<mml::IVector3>> uniforms_int3;
-			std::vector<ShaderUniform<mml::IVector4>> uniforms_int4;
+			inline void clear()
+			{
+				_uniforms_Int.clear();
+				_uniforms_Int2.clear();
+				_uniforms_Int3.clear();
+				_uniforms_Int4.clear();
 
-			std::vector<ShaderUniform<float>> uniforms_float;
-			std::vector<ShaderUniform<mml::Vector2>> uniforms_float2;
-			std::vector<ShaderUniform<mml::Vector3>> uniforms_float3;
-			std::vector<ShaderUniform<mml::Vector4>> uniforms_float4;
+				_uniforms_Float.clear();
+				_uniforms_Float2.clear();
+				_uniforms_Float3.clear();
+				_uniforms_Float4.clear();
 
-			std::vector<ShaderUniform<mml::Matrix4>> uniforms_matrix4;
-
-			void add(const ShaderUniform<int>& uniform) { uniforms_int.push_back(uniform); }
-			void add(const ShaderUniform<mml::IVector2>& uniform) { uniforms_int2.push_back(uniform); }
-			void add(const ShaderUniform<mml::IVector3>& uniform) { uniforms_int3.push_back(uniform); }
-			void add(const ShaderUniform<mml::IVector4>& uniform) { uniforms_int4.push_back(uniform); }
-
-			void add(const ShaderUniform<float>& uniform) {uniforms_float.push_back(uniform); }
-			void add(const ShaderUniform<mml::Vector2>& uniform) { uniforms_float2.push_back(uniform); }
-			void add(const ShaderUniform<mml::Vector3>& uniform) { uniforms_float3.push_back(uniform); }
-			void add(const ShaderUniform<mml::Vector4>& uniform) { uniforms_float4.push_back(uniform); }
-		
-			void add(const ShaderUniform<mml::Matrix4>& uniform) { uniforms_matrix4.push_back(uniform); }
+				_uniforms_Matrix4.clear();
+			}
 		};
 	}
 }

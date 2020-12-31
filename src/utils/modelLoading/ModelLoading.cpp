@@ -258,7 +258,6 @@ namespace fungine
 					(*normalTexture) = load_material_texture(assimpMaterial, aiTextureType_HEIGHT);
 
 				outMaterial = Material::create_material__default3D(
-					nullptr,
 					{ *diffuseTexture, *specularTexture, *normalTexture }
 				);
 

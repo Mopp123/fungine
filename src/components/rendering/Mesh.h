@@ -25,6 +25,8 @@ namespace fungine
 			int _instanceCount = 1;
 			bool _isStatic = false;
 
+			bool _enableShadows = true;
+
 			// This is kind of a "necessary evil" when using opengl.. 
 			// We dont want to downcast a Mesh into OpenglMesh in the future, so we need to know this vaoID somewhere.
 			// Direct3d for example doesn't have vertex array objects, so this kinds of graphics apis just have this hanging uselessly here..
@@ -45,8 +47,11 @@ namespace fungine
 			inline graphics::IndexBuffer* getIndexBuffer() { return _indexBuffer; }
 			inline const graphics::IndexBuffer* getIndexBuffer() const { return _indexBuffer; }
 
+			inline void enableShadows(bool arg) { _enableShadows = arg; }
+
 			inline const graphics::DrawType& getDrawType() const { return _drawType; }
 			inline bool isStatic() const { return _isStatic; }
+			inline bool hasShadows() const { return _enableShadows; }
 			inline const int& getInstanceCount() const { return _instanceCount; }
 			inline const unsigned int& getAPISpecific_vaoID() const { return _vaoID; }
 		};

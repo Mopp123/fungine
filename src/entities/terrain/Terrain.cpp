@@ -27,12 +27,12 @@ namespace fungine
 			_material = Material::create_material__default3D(
 				shaderToUse,
 				{
-					{"texture_blendmap", blendmapTexture},
+					blendmapTexture,
 
-					{"texture_black_diffuse", black_diffuse },	{"texture_black_specular", black_specular },{"texture_black_normal", black_normal },
-					{"texture_red_diffuse", red_diffuse },		{"texture_red_specular", red_specular },	{"texture_red_normal", red_normal},
-					{"texture_green_diffuse", green_diffuse },	{"texture_green_specular", green_specular },{"texture_green_normal", green_normal},
-					{"texture_blue_diffuse", blue_diffuse },	{"texture_blue_specular", blue_specular },	{"texture_blue_normal", blue_normal}
+					black_diffuse,	black_specular, black_normal,
+					red_diffuse,	red_specular,	red_normal,
+					green_diffuse,	green_specular, green_normal,
+					blue_diffuse,	blue_specular,	blue_normal
 				}
 			);
 
@@ -48,6 +48,7 @@ namespace fungine
 			}
 
 			generateMesh();
+			_mesh->enableShadows(false);
 
 			_transform = std::make_shared<Transform>(mml::Vector3(0, 0, 0), mml::Quaternion({0,1,0}, 0), mml::Vector3(1,1,1));
 			addComponent(_transform);
@@ -168,13 +169,13 @@ namespace fungine
 					unsigned int bottomLeft = x + z * _verticesPerRow;
 					unsigned int bottomRight = (x + 1) + z * _verticesPerRow;
 
-					indices.push_back(topRight);
+					indices.push_back(bottomLeft);
 					indices.push_back(topLeft);
-					indices.push_back(bottomLeft);
-				
-					indices.push_back(bottomLeft);
-					indices.push_back(bottomRight);
 					indices.push_back(topRight);
+				
+					indices.push_back(topRight);
+					indices.push_back(bottomRight);
+					indices.push_back(bottomLeft);
 					
 				}
 			}

@@ -19,6 +19,7 @@ namespace fungine
 			_name(name)
 		{}
 
+
 		ShaderProgram* ShaderProgram::create_shader_program(
 			const std::string& name,
 			ShaderStage* vertexShader,
@@ -57,5 +58,30 @@ namespace fungine
 			}
 		}
 
+		/* ! ! ! THIS WAS COMPLETELY BROKEN PIECE OF SHIT SYSTEM ! ! !
+		  ------------------------------------------------------------
+		template void ShaderProgram::addUniform<int>(const ShaderUniform<int>& uniform);
+		template void ShaderProgram::addUniform<mml::IVector2>(const ShaderUniform<mml::IVector2>& uniform);
+		template void ShaderProgram::addUniform<mml::IVector3>(const ShaderUniform<mml::IVector3>& uniform);
+		template void ShaderProgram::addUniform<mml::IVector4>(const ShaderUniform<mml::IVector4>& uniform);
+
+		template void ShaderProgram::addUniform<float>(const ShaderUniform<float>& uniform);
+		template void ShaderProgram::addUniform<mml::Vector2>(const ShaderUniform<mml::Vector2>& uniform);
+		template void ShaderProgram::addUniform<mml::Vector3>(const ShaderUniform<mml::Vector3>& uniform);
+		template void ShaderProgram::addUniform<mml::Vector4>(const ShaderUniform<mml::Vector4>& uniform);
+
+		template void ShaderProgram::addUniform<mml::Matrix4>(const ShaderUniform<mml::Matrix4>& uniform);
+
+		template<typename T>
+		void ShaderProgram::addUniform(const ShaderUniform<T>& uniform)
+		{
+			ShaderUniform<T> u = uniform;
+			u._location = getUniformLocation(u.getName());
+			RendererCommands* rendererCommands = Graphics::get_renderer_commands();
+			rendererCommands->bindShader(this);
+			setUniform(u.getLocation(), *u.getData());
+			rendererCommands->unbindShader();
+			_uniformList.add(u);
+		}*/
 	}
 }

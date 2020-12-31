@@ -1,5 +1,6 @@
 #pragma once
 
+#include "shaders/ShaderProgram.h"
 #include <vector>
 #include <memory.h>
 
@@ -38,18 +39,6 @@ namespace fungine
 			StaticDraw,
 			StreamDraw,
 			DynamicDraw
-		};
-
-		enum class ShaderDataType
-		{
-			Float,
-			Float2,
-			Float3,
-			Float4,
-			Int,
-			Int2,
-			Int3,
-			Int4
 		};
 
 		struct VertexBufferElement

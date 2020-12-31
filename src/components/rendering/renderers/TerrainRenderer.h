@@ -15,14 +15,14 @@ namespace fungine
 			{
 			private:
 
-				std::vector<std::pair<std::shared_ptr<Material>, std::vector<entities::Entity*>>> _batches;
+				std::vector<entities::Entity*> _renderList;
 
 			public:
 
-				TerrainRenderer(bool renderShadows = false);
+				TerrainRenderer();
 				~TerrainRenderer();
 
-				virtual void flush(
+				virtual void render(
 					const mml::Matrix4& projectionMatrix,
 					const mml::Matrix4& viewMatrix,
 					unsigned int renderFlags
@@ -35,23 +35,6 @@ namespace fungine
 			protected:
 
 				virtual void submit(entities::Entity* e) override;
-
-				virtual void setMaterialUniforms(
-					const graphics::RendererCommands* rendererCommands,
-					Material* material,
-					graphics::ShaderProgram* shader
-				) const override;
-
-				virtual void setLightingUniforms(
-					graphics::ShaderProgram* shader,
-					const DirectionalLight* directionalLight
-				) const override;
-
-				virtual void setShadowUniforms(
-					const graphics::RendererCommands* rendererCommands,
-					graphics::ShaderProgram* shader,
-					ShadowCaster& shadowCaster
-				) const override;
 			};
 		}
 	}

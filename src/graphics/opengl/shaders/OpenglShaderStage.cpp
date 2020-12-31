@@ -22,6 +22,78 @@ namespace fungine
 				Debug::notify_on_destroy("Opengl" + ShaderProgram::shader_stage_to_string(_type));
 			}
 
+			static ShaderDataType to_uniform_data_type(const std::string& uniformDataType)
+			{
+				if (uniformDataType == "float")		return ShaderDataType::Float;
+				if (uniformDataType == "vec2")		return ShaderDataType::Float2;
+				if (uniformDataType == "vec3")		return ShaderDataType::Float3;
+				if (uniformDataType == "vec4")		return ShaderDataType::Float4;
+				
+				if (uniformDataType == "int")		return ShaderDataType::Int;
+
+				if (uniformDataType == "mat4")		return ShaderDataType::Matrix4;
+				
+				if (uniformDataType == "sampler2D") return ShaderDataType::Texture2D;
+
+				return ShaderDataType::None;
+			}
+
+			std::vector<std::pair<std::string, ModifyableUniform>> OpenglShaderStage::findModifyableUniforms()
+			{
+				std::vector<std::pair<std::string, ModifyableUniform>> uniforms;
+
+				std::string s = _sourceCode;
+
+				while (!s.empty())
+				{
+					size_t index = 0;
+					std::string line;
+					for (char c : s)
+					{
+						index++;
+						if (c == '\n' || c == '\r')
+							continue;
+
+						if (c != ';')
+							line += c;
+						else
+							break;
+					}
+
+					s.erase(s.begin(), s.begin() + index);
+					
+					size_t uPos = line.find("uniform ");
+					if (uPos != std::string::npos)
+					{
+						// word "uniform" should be the first thing on the line
+						size_t startPos = 8;
+						// find next word..
+						std::string dataType;
+						std::string name;
+
+						bool lastPart = false;
+						for (int i = startPos; i < line.size(); i++)
+						{
+							const char& c = line[i];
+							if (c == ' ')
+							{
+								lastPart = true;
+								continue;
+							}
+
+							lastPart ? name += c : dataType += c;
+						}
+						if (name[0] == 'm' && name[1] == '_')
+						{
+							ModifyableUniform mu = { name, -1, to_uniform_data_type(dataType) };
+							uniforms.push_back(std::make_pair(name, mu));
+						}
+					}
+				}
+				_sourceCode.clear();
+				return uniforms;
+			}
+
 			unsigned int OpenglShaderStage::loadFromSource(const std::string& path, ShaderStageType type)
 			{
 				GLenum glShaderType = 0;
@@ -72,6 +144,7 @@ namespace fungine
 				GLuint shaderID = GL_FUNC(glCreateShader(glShaderType));
 				GL_FUNC(glShaderSource(shaderID, 1, &shaderSource, &fileLength));
 
+				_sourceCode = shaderSource;
 				delete[] shaderSource;
 
 				GL_FUNC(glCompileShader(shaderID));

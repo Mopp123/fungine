@@ -19,8 +19,10 @@ namespace fungine
 		Time();
 		static void update();
 
+		static float& get_time_uniform();
 		static double get_time();
 		inline static double get_fps() { return s_fps; }
 		inline static double get_delta_time() { return s_deltaTime; }
+
 	};
 }

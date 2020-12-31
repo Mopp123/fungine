@@ -13,7 +13,7 @@ namespace fungine
 	{
 		class Light : public Component
 		{
-		private:
+		protected:
 			mml::Vector3 _color = mml::Vector3(1, 1, 1);
 			mml::Vector3 _ambientColor = mml::Vector3(0, 0, 0);
 
@@ -27,7 +27,7 @@ namespace fungine
 			inline void setAmbientColor(const mml::Vector3& color)	{ _ambientColor = color; }
 		
 			inline const mml::Vector3& getColor() const			{ return _color; }
-			inline const mml::Vector3& getAmbientColor() const	{ return _ambientColor; }
+			inline const mml::Vector3& getAmbientColor() const  { return _ambientColor; }
 		};
 
 
@@ -55,7 +55,7 @@ namespace fungine
 
 			mml::Vector3 getDirection() const;
 			
-			inline ShadowCaster& getShadowCaster() { return _shadowCaster; }
+			inline const ShadowCaster& getShadowCaster() const { return _shadowCaster; }
 
 			inline static DirectionalLight* get_directional_light() { return s_directionalLight; }
 

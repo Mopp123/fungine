@@ -13,6 +13,8 @@ namespace fungine
 			unsigned int _id = 0;
 			ShaderStageType _type = ShaderStageType::VertexShader;
 
+			std::string _sourceCode = "";
+
 			// We allow ShaderStage creation only through the function "create_shader_stage".
 			//	-> make operator new inaccessable for outsiders
 			void* operator new(size_t size);
@@ -26,6 +28,9 @@ namespace fungine
 
 			inline const unsigned int& getID() const { return _id; }
 			inline const ShaderStageType& getStageType() const { return _type; }
+			inline const std::string& getSourceCode() const { return _sourceCode; }
+
+			virtual std::vector<std::pair<std::string, ModifyableUniform>> findModifyableUniforms() = 0;
 		};
 	}
 }

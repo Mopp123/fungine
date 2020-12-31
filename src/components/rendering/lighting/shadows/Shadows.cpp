@@ -146,7 +146,9 @@ namespace fungine
 			float height = (pMaxY - pMinY);
 			float length = (pMaxZ - pMinZ);
 
-			mml::create_orthographic_projection_matrix(_projectionMatrix, -width, width, height, -height, -length, length);
+			// * I have no idea why height has to be multiplied by 2, but if it wasnt multiplied by 2 we may sometimes get 
+			// shadows looking way too wrong..
+			mml::create_orthographic_projection_matrix(_projectionMatrix, -width, width, height * 2, -height * 2, -length, length);
 
 			// Then finally our shadow caster's view matrix
 			mml::create_view_matrix(_viewMatrix, centerPos, _transform->getRotation());

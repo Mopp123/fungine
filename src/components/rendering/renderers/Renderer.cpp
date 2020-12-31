@@ -17,8 +17,8 @@ namespace fungine
 			std::vector<Renderer*> Renderer::s_allRenderers;
 			Framebuffer* Renderer::s_framebuffer = nullptr;
 
-			Renderer::Renderer(bool renderShadows, const std::string& name) :
-				Component(name), _renderShadows(renderShadows)
+			Renderer::Renderer(const std::string& name) :
+				Component(name)
 			{
 				if (!s_framebuffer)
 					s_framebuffer = Framebuffer::create_framebuffer(core::Window::get_width(), core::Window::get_height(), true);

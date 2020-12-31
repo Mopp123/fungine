@@ -33,33 +33,24 @@ namespace fungine
 
 			Camera* camera = Camera::get_current_camera();
 			DirectionalLight* directionalLight = DirectionalLight::get_directional_light();
-			ShadowCaster& shadowCaster = directionalLight->getShadowCaster();
+			const ShadowCaster& shadowCaster = directionalLight->getShadowCaster();
 
 			// Render shadowmap
-			Framebuffer* shadowmapFramebuffer = directionalLight->getShadowCaster().getFramebuffer();
+			const Framebuffer* shadowmapFramebuffer = directionalLight->getShadowCaster().getFramebuffer();
 			
 			s_rendererCommands->bindFramebuffer(shadowmapFramebuffer);
 			s_rendererCommands->clear();
 
 			for (Renderer* renderer : Renderer::get_all_renderers())
-			{
-				if (renderer->rendersShadows())
-				{
-					renderer->flush(
-						shadowCaster.getProjectionMatrix(),
-						shadowCaster.getViewMatrix(),
-						RenderFlags::RenderGeometry |
-						RenderFlags::RenderMaterial
-					);
-				}
-			}
+				renderer->renderShadows();
+
 			// Render to screen
 			Framebuffer* screenFramebuffer = Renderer::get_screen_framebuffer();
 
 			s_rendererCommands->bindFramebuffer(screenFramebuffer);
 			s_rendererCommands->clear();
 			for (Renderer* renderer : Renderer::get_all_renderers())
-				renderer->flush(
+				renderer->render(
 					camera->getProjectionMatrix(),
 					camera->getViewMatrix(),
 					RenderFlags::RenderGeometry |

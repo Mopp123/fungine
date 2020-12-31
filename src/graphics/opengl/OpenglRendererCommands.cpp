@@ -35,21 +35,50 @@ namespace fungine
 			void OpenglRendererCommands::clear() const
 			{
 				// *TEMPORARY -> move this somewhere else in the future..
-				glEnable(GL_BLEND);
-				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+				GL_FUNC(glEnable(GL_BLEND));
+				GL_FUNC(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 				GL_FUNC(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 			}
 
-			void OpenglRendererCommands::bindTexture(Texture* texture, unsigned int slot) const
+			void OpenglRendererCommands::bindShader(ShaderProgram* shader) const
+			{
+				GL_FUNC(glUseProgram(shader->getID()));
+			}
+			void OpenglRendererCommands::unbindShader() const
+			{
+				GL_FUNC(glUseProgram(0));
+			}
+
+			void OpenglRendererCommands::cullFace(CullFace face) const
+			{
+				switch (face)
+				{
+				case CullFace::None :
+					glDisable(GL_CULL_FACE);
+					break;
+				case CullFace::Back:
+					glEnable(GL_CULL_FACE);
+					glCullFace(GL_BACK);
+					break;
+				case CullFace::Front:
+					glEnable(GL_CULL_FACE);
+					glCullFace(GL_FRONT);
+					break;
+				}
+			}
+
+			void OpenglRendererCommands::bindTexture(const Texture* texture, unsigned int slot) const
 			{
 				GLenum glTextureSlot = GL_NONE;
 				convert_to_GLenum__texture_slot(slot, glTextureSlot);
 				GL_FUNC(glActiveTexture(glTextureSlot));
 				GL_FUNC(glBindTexture(GL_TEXTURE_2D, texture->getID()));
 			}
-			void OpenglRendererCommands::unbindTexture() const
+			void OpenglRendererCommands::unbindTexture(const Texture* texture, unsigned int slot) const
 			{
-				GL_FUNC(glActiveTexture(GL_TEXTURE0));
+				GLenum glTextureSlot = GL_NONE;
+				convert_to_GLenum__texture_slot(slot, glTextureSlot);
+				GL_FUNC(glActiveTexture(glTextureSlot));
 				GL_FUNC(glBindTexture(GL_TEXTURE_2D, 0));
 			}
 
@@ -90,47 +119,57 @@ namespace fungine
 			}
 
 
+			
+			
 			template<typename T>
-			static void send_uniform_list_to_shader(const std::vector<ShaderUniform<T>>& list, ShaderProgram* shader)
+			static void upload_uniform(ShaderProgram* shader, const std::vector<ShaderUniform<T>>& uniforms)
 			{
-				for (const ShaderUniform<T>& u : list) shader->setUniform(u.getLocation(), *u.getData());
-			}
+				for (const ShaderUniform<T>& u : uniforms)
+				{
+					const int& location = u.location;
+#ifdef DEBUG__MODE_FULL
+					if (location <= -1)
+					{
+						Debug::log(
+							"Location: (OpenglRendererCommands) template<typename T> static void upload_uniform(\n"
+							"ShaderProgram * shader,\n"
+							"const std::vector<ShaderUniform<T>>&uniforms\n"
+							")\n"
+							"Invalid uniform location!",
+							DEBUG__ERROR_LEVEL__ERROR
+						);
+						continue;
+					}
+#endif
 
+					shader->setUniform(location, u.data);
+				}
+			}
 			void OpenglRendererCommands::bindMaterial(Material* const material) const
 			{
-				// bind shader
 				ShaderProgram* shader = material->getShader();
-				shader->bind();
+				bindShader(shader);
 
 				// Bind all textures
 				for (int i = 0; i < MATERIAL__MAX_TEXTURES; ++i)
 				{
 					const Texture* const texture = material->getTexture(i);
 					if (texture)
-					{
-						GLenum glTextureSlot = GL_NONE;
-						convert_to_GLenum__texture_slot(i, glTextureSlot);
-						if (glTextureSlot != GL_NONE)
-						{
-							glActiveTexture(glTextureSlot);
-							glBindTexture(GL_TEXTURE_2D, texture->getID());
-						}
-					}
+						bindTexture(texture, i);
 				}
 
-				// Send all material's uniforms
-				const ShaderUniformList& uniformList = material->getUniformList();
-				send_uniform_list_to_shader<int>(uniformList.uniforms_int, shader);
-				send_uniform_list_to_shader<mml::IVector2>(uniformList.uniforms_int2, shader);
-				send_uniform_list_to_shader<mml::IVector3>(uniformList.uniforms_int3, shader);
-				send_uniform_list_to_shader<mml::IVector4>(uniformList.uniforms_int4, shader);
-				
-				send_uniform_list_to_shader<float>(uniformList.uniforms_float, shader);
-				send_uniform_list_to_shader<mml::Vector2>(uniformList.uniforms_float2, shader);
-				send_uniform_list_to_shader<mml::Vector3>(uniformList.uniforms_float3, shader);
-				send_uniform_list_to_shader<mml::Vector4>(uniformList.uniforms_float4, shader);
+				const UniformList& matUniformList = material->getUniformList();
+				upload_uniform<int>(shader, matUniformList.getUniforms_Int());
+				upload_uniform<mml::IVector2>(shader, matUniformList.getUniforms_Int2());
+				upload_uniform<mml::IVector3>(shader, matUniformList.getUniforms_Int3());
+				upload_uniform<mml::IVector4>(shader, matUniformList.getUniforms_Int4());
 
-				send_uniform_list_to_shader<mml::Matrix4>(uniformList.uniforms_matrix4, shader);
+				upload_uniform<float>(shader, matUniformList.getUniforms_Float());
+				upload_uniform<mml::Vector2>(shader, matUniformList.getUniforms_Float2());
+				upload_uniform<mml::Vector3>(shader, matUniformList.getUniforms_Float3());
+				upload_uniform<mml::Vector4>(shader, matUniformList.getUniforms_Float4());
+
+				upload_uniform<mml::Matrix4>(shader, matUniformList.getUniforms_Matrix4());
 			}
 			void OpenglRendererCommands::unbindMaterial(const Material* const material) const
 			{
@@ -139,18 +178,9 @@ namespace fungine
 				{
 					const Texture* const texture = material->getTexture(i);
 					if (texture)
-					{
-						GLenum glTextureSlot = GL_NONE;
-						convert_to_GLenum__texture_slot(i, glTextureSlot);
-						if (glTextureSlot != GL_NONE)
-						{
-							glActiveTexture(glTextureSlot);
-							glBindTexture(GL_TEXTURE_2D, 0);
-						}
-					}
+						unbindTexture(texture, i);
 				}
-
-				glUseProgram(0); // "unbind shader program"
+				unbindShader();
 			}
 
 

@@ -302,6 +302,7 @@ namespace mml
 		outMatrix[2 + 2 * 4] = -((zFar + zNear) / (zFar - zNear));
 		outMatrix[2 + 3 * 4] = -((2.0f * zFar * zNear) / (zFar - zNear));
 		outMatrix[3 + 2 * 4] = -1.0f;
+		outMatrix[3 + 3 * 4] = 0.0f;
 	}
 
 	void translate_matrix(Matrix4& m, const Vector3& position)

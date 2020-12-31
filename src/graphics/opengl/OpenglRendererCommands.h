@@ -108,9 +108,11 @@ namespace fungine
 				virtual void init() const override;
 				virtual void clear() const override;
 
-
-				virtual void bindTexture(Texture* texture, unsigned int slot) const override;
-				virtual void unbindTexture() const override;
+				virtual void bindShader(ShaderProgram* shader) const override;
+				virtual void unbindShader() const override; // kind of pointless?
+				virtual void cullFace(CullFace face) const override;
+				virtual void bindTexture(const Texture* texture, unsigned int slot) const override;
+				virtual void unbindTexture(const Texture* texture, unsigned int slot) const override;
 				virtual void bindMesh(const components::Mesh* const mesh) const override;
 				virtual void unbindMesh(const components::Mesh* const mesh) const override;
 				virtual void drawIndices(const components::Mesh* const mesh) const override;

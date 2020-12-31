@@ -35,27 +35,26 @@ namespace fungine
 				std::vector<entities::Entity*> _entities; // Entities this renderer has been attached to
 				
 				bool _batchCreated = false;
-				bool _renderShadows = false;
 
 				static std::vector<Renderer*> s_allRenderers;
 				static graphics::Framebuffer* s_framebuffer; // *->TEMP : just testing framebuffer here..
 
 			public:
-				Renderer(bool renderShadows, const std::string& name = RENDERER_DEFAULT_NAME);
+				Renderer(const std::string& name = RENDERER_DEFAULT_NAME);
 				virtual ~Renderer();
 				
 				virtual void onAttackToEntity(entities::Entity* entity) override;
 				virtual void update() override;
 
-				virtual void flush(
+				virtual void render(
 					const mml::Matrix4& projectionMatrix,
 					const mml::Matrix4& viewMatrix,
 					unsigned int renderFlags
 				) {}
 
-				virtual void clear() {}
+				virtual void renderShadows() {}
 
-				inline bool rendersShadows() const { return _renderShadows; }
+				virtual void clear() {}
 
 				inline static std::vector<Renderer*> get_all_renderers() { return s_allRenderers; }
 				inline static graphics::Framebuffer* get_screen_framebuffer() { return s_framebuffer; }
@@ -63,23 +62,6 @@ namespace fungine
 
 			protected:
 				virtual void submit(entities::Entity* entity) {}
-
-				virtual void setMaterialUniforms(
-					const graphics::RendererCommands* rendererCommands, 
-					Material* material,
-					graphics::ShaderProgram* shader
-				) const {}
-				
-				virtual void setLightingUniforms(
-					graphics::ShaderProgram* shader, 
-					const DirectionalLight* directionalLight
-				) const {}
-				
-				virtual void setShadowUniforms(
-					const graphics::RendererCommands* rendererCommands,
-					graphics::ShaderProgram* shader,
-					ShadowCaster& shadowCaster
-				) const {}
 			};
 		}
 	}

@@ -19,8 +19,7 @@ namespace fungine
 		namespace rendering
 		{
 
-			TerrainRenderer::TerrainRenderer(bool renderShadows) : 
-				Renderer(renderShadows)
+			TerrainRenderer::TerrainRenderer()
 			{
 				if (!s_framebuffer)
 					s_framebuffer = Framebuffer::create_framebuffer(core::Window::get_width(), core::Window::get_height(), true);
@@ -32,22 +31,10 @@ namespace fungine
 
 			void TerrainRenderer::submit(Entity* e)
 			{
-				std::shared_ptr<Material> entityMaterial = e->getComponent<Material>();
-				for (std::pair<std::shared_ptr<Material>, std::vector<Entity*>>& batch : _batches)
-				{
-					if (batch.first == entityMaterial)
-					{
-						batch.second.push_back(e);
-						return;
-					}
-				}
-
-				std::vector<Entity*> newBatch;
-				newBatch.push_back(e);
-				_batches.push_back(std::make_pair(entityMaterial, newBatch));
+				_renderList.push_back(e);
 			}
 
-			void TerrainRenderer::flush(
+			void TerrainRenderer::render(
 				const mml::Matrix4& projectionMatrix,
 				const mml::Matrix4& viewMatrix,
 				unsigned int renderFlags
@@ -56,6 +43,8 @@ namespace fungine
 				const RendererCommands* rendererCommands = Graphics::get_renderer_commands();
 				Camera* camera = Camera::get_current_camera();
 				DirectionalLight* directionalLight = DirectionalLight::get_directional_light();
+
+				rendererCommands->cullFace(CullFace::Back);
 
 				bool renderGeometry = true;
 				bool renderMaterial = renderFlags & RenderFlags::RenderMaterial;
@@ -66,86 +55,92 @@ namespace fungine
 				if (!camera)
 				{
 					Debug::log(
-						"Location: void TerrainRenderer::flush()"
+						"Location: void TerrainRenderer::flush(\n"
+						"const mml::Matrix4 & projectionMatrix,\n"
+						"const mml::Matrix4 & viewMatrix,\n"
+						"unsigned int renderFlags,\n"
+						"RenderPass renderPass\n"
+						")\n"
 						"Tried to flush renderer, but the current camera was nullptr!",
 						DEBUG__ERROR_LEVEL__ERROR
 					);
 					return;
 				}
 #endif
-				for (std::pair<std::shared_ptr<Material>, std::vector<Entity*>>& batch : _batches)
-				{
-					Material* material = batch.first.get();
-					ShaderProgram* shader = material->getShader();
 
+				for (Entity* e : _renderList)
+				{
+					Material* material = e->getComponent<Material>().get();
+					ShaderProgram* shader = material->getShader();
+					Mesh* mesh = e->getComponent<Mesh>().get();
+					
+#ifdef DEBUG__MODE_FULL
+					if (!mesh)
+					{
+						Debug::log(
+							"Location: void TerrainRenderer::flush(\n"
+							"const mml::Matrix4 & projectionMatrix,\n"
+							"const mml::Matrix4 & viewMatrix,\n"
+							"unsigned int renderFlags,\n"
+							"RenderPass renderPass\n"
+							")\n"
+							"Mesh of a batch was nullptr!",
+							DEBUG__ERROR_LEVEL__ERROR
+						);
+						continue;
+					}
+#endif
 					// Either bind the material or just plain shader
 					// (RendererCommands::bindMaterial(Material*) also binds the material's shader!)
-					renderMaterial ? setMaterialUniforms(rendererCommands, material, shader) : shader->bind();
+					rendererCommands->bindShader(shader);
+					if(renderMaterial)
+						rendererCommands->bindMaterial(material);
 
 					// common uniforms
 					shader->setUniform("projectionMatrix", projectionMatrix);
 					shader->setUniform("viewMatrix", viewMatrix);
 					shader->setUniform("cameraPos", camera->getEntity()->getComponent<Transform>()->getPosition());
 
-					if (renderLighting) setLightingUniforms(shader, directionalLight);
-					if (renderShadows)	setShadowUniforms(rendererCommands, shader, directionalLight->getShadowCaster());
-
-					// per entity inside the batch
-					for (Entity* e : batch.second)
+					if (renderLighting)
 					{
-						std::shared_ptr<Mesh> mesh = e->getComponent<Mesh>();
-						// per entity uniforms
-						shader->setUniform("transformationMatrix", e->getComponent<Transform>()->getTransformationMatrix());
+						shader->setUniform("directionalLight_direction", directionalLight->getDirection());
+						shader->setUniform("directionalLight_ambientColor", directionalLight->getAmbientColor());
+						shader->setUniform("directionalLight_color", directionalLight->getColor());
+					}
+					if (renderShadows)
+					{
+						const ShadowCaster& shadowCaster = directionalLight->getShadowCaster();
 
-						// Finally drawing..
-						rendererCommands->bindMesh(mesh.get());
-						rendererCommands->drawIndices(mesh.get());
-						rendererCommands->unbindMesh(mesh.get());
+						shader->setUniform("shadowProjMat", shadowCaster.getProjectionMatrix());
+						shader->setUniform("shadowViewMat", shadowCaster.getViewMatrix());
+
+						shader->setUniform("shadowProperties.shadowmapWidth", shadowCaster.getFramebuffer()->getWidth());
+						shader->setUniform("shadowProperties.pcfCount", 1);
+
+						shader->setUniform("texture_shadowmap", 14);
+
+						rendererCommands->bindTexture(shadowCaster.getShadowmapTexture(), 14);
 					}
 
+					// per entity uniforms
+					shader->setUniform("transformationMatrix", e->getComponent<Transform>()->getTransformationMatrix());
+
+					// Finally drawing..
+					rendererCommands->bindMesh(mesh);
+					rendererCommands->drawIndices(mesh);
+					rendererCommands->unbindMesh(mesh);
+					
 					// Unbind the batch's shit..
-					renderMaterial ? rendererCommands->unbindMaterial(material) : shader->unbind();
+					if(renderMaterial) 
+						rendererCommands->unbindMaterial(material);
+					
+					rendererCommands->unbindShader();
 				}
 			}
 
-
 			void TerrainRenderer::clear()
 			{
-				_batches.clear();
-			}
-
-
-			void TerrainRenderer::setMaterialUniforms(
-				const RendererCommands* rendererCommands, 
-				Material* material,
-				graphics::ShaderProgram* shader
-			) const
-			{
-				rendererCommands->bindMaterial(material);
-			}
-
-			void TerrainRenderer::setLightingUniforms(
-				graphics::ShaderProgram* shader, 
-				const DirectionalLight* directionalLight
-			) const
-			{
-				shader->setUniform("directionalLight_direction", directionalLight->getDirection());
-				shader->setUniform("directionalLight_ambientColor", directionalLight->getAmbientColor());
-				shader->setUniform("directionalLight_color", directionalLight->getColor());
-			}
-
-			void TerrainRenderer::setShadowUniforms(
-				const RendererCommands* rendererCommands,
-				graphics::ShaderProgram* shader, 
-				ShadowCaster& shadowCaster
-			) const
-			{
-				shader->setUniform("shadowProjMat", shadowCaster.getProjectionMatrix());
-				shader->setUniform("shadowViewMat", shadowCaster.getViewMatrix());
-
-				shader->setUniform("texture_shadowmap", 14);
-
-				rendererCommands->bindTexture(shadowCaster.getShadowmapTexture(), 14);
+				_renderList.clear();
 			}
 
 			const size_t TerrainRenderer::getSize() const

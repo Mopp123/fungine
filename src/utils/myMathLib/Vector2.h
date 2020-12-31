@@ -6,7 +6,9 @@ namespace mml
 	// *This can be used only as a container for integers..
 	struct IVector2
 	{
-		int x, y;
+		int x = 0;
+		int y = 0;
+		IVector2() {}
 		IVector2(int X, int Y) : x(X), y(Y) {}
 	};
 

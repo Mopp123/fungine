@@ -13,7 +13,7 @@ namespace fungine
 		class Camera : public Component
 		{
 		private:
-			float _fov = 70.0f;
+			float _fov = 1.22173048f;
 			float _aspectRatio = 0.0f;
 			float _zNear = 0.0f;
 			float _zFar = 0.0f;
@@ -42,8 +42,8 @@ namespace fungine
 			inline const float getZNear() const { return _zNear; }
 			inline const float getZFar() const { return _zFar; }
 
-			inline mml::Matrix4& getViewMatrix() { return _viewMatrix; }
-			inline mml::Matrix4& getProjectionMatrix() { return _projectionMatrix; }
+			inline const mml::Matrix4& getViewMatrix() const { return _viewMatrix; }
+			inline const mml::Matrix4& getProjectionMatrix() const { return _projectionMatrix; }
 
 			inline static Camera* get_current_camera() { return s_currentCamera; }
 

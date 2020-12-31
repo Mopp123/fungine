@@ -8,7 +8,8 @@ namespace mml
 	// *This can be used only as a container for integers..
 	struct IVector4 : public IVector3
 	{
-		int w;
+		int w = 0;
+		IVector4() {}
 		IVector4(int X, int Y, int Z, int W) : IVector3(X, Y, Z), w(W) {}
 	};
 

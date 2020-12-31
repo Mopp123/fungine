@@ -32,10 +32,10 @@ namespace fungine
 			virtual void update() = 0;
 
 			inline const mml::Matrix4& getProjectionMatrix() const { return _projectionMatrix; }
-			inline const mml::Matrix4& getViewMatrix() const { return _viewMatrix; }
+			inline const mml::Matrix4& getViewMatrix()const  { return _viewMatrix; }
 
-			inline graphics::Framebuffer* getFramebuffer() { return _framebuffer; }
-			inline graphics::Texture* getShadowmapTexture() { return _shadowmap; }
+			inline const graphics::Framebuffer* getFramebuffer() const	{ return _framebuffer; }
+			inline const graphics::Texture* getShadowmapTexture() const { return _shadowmap; }
 		};
 
 		class DirectionalShadowCaster : public ShadowCaster

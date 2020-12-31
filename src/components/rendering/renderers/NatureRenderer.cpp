@@ -20,8 +20,7 @@ namespace fungine
 		namespace rendering
 		{
 
-			NatureRenderer::NatureRenderer(bool renderShadows) :
-				Renderer(renderShadows)
+			NatureRenderer::NatureRenderer()
 			{
 				if (!s_framebuffer)
 					s_framebuffer = Framebuffer::create_framebuffer(core::Window::get_width(), core::Window::get_height(), true);
@@ -66,7 +65,7 @@ namespace fungine
 				createNewBatch(entity, material, mesh, createNewMeshCpy);
 			}
 
-			void NatureRenderer::flush(
+			void NatureRenderer::render(
 				const mml::Matrix4& projectionMatrix,
 				const mml::Matrix4& viewMatrix,
 				unsigned int renderFlags
@@ -75,18 +74,25 @@ namespace fungine
 				const RendererCommands* rendererCommands = Graphics::get_renderer_commands();
 				Camera* camera = Camera::get_current_camera();
 				DirectionalLight* directionalLight = DirectionalLight::get_directional_light();
+				const ShadowCaster& shadowCaster = directionalLight->getShadowCaster();
+				const Framebuffer* shadowmapFramebuffer = shadowCaster.getFramebuffer();
 
 				bool renderGeometry = true;
 				bool renderMaterial = renderFlags & RenderFlags::RenderMaterial;
 				bool renderLighting = renderFlags & RenderFlags::RenderLighting;
 				bool renderShadows =  renderFlags & RenderFlags::RenderShadows;
 
+
 #ifdef DEBUG__MODE_FULL
 				if (!camera)
 				{
 					Debug::log(
-						"Location: void NatureRenderer::flush()"
-						"Tried to flush renderer, but the current camera was nullptr!",
+						"Location: void NatureRenderer::render(\n"
+						"			const mml::Matrix4 & projectionMatrix, \n"
+						"			const mml::Matrix4 & viewMatrix, \n"
+						"			unsigned int renderFlags\n"
+						"			)\n"
+						"Tried to render, but the current camera was nullptr!",
 						DEBUG__ERROR_LEVEL__ERROR
 					);
 					return;
@@ -94,33 +100,60 @@ namespace fungine
 #endif
 				for (std::pair<std::shared_ptr<Mesh>, std::shared_ptr<BatchData>>& batch : _batches)
 				{
+#ifdef DEBUG__MODE_FULL
+					if (!batch.second)
+					{
+						Debug::log(
+							"Location: void NatureRenderer::render(\n"
+							"			const mml::Matrix4 & projectionMatrix, \n"
+							"			const mml::Matrix4 & viewMatrix, \n"
+							"			unsigned int renderFlags\n"
+							"			)\n"
+							"Mesh of a batch was nullptr!",
+							DEBUG__ERROR_LEVEL__ERROR
+						);
+						continue;
+					}
+#endif
 					Material* material = batch.second->material.get();
 					Mesh* mesh = batch.second->mesh.get();
-					const unsigned int meshInstanceCount = mesh->getInstanceCount();
-
 					ShaderProgram* shader = material->getShader();
-
-					renderMaterial ? setMaterialUniforms(rendererCommands, material, shader) : shader->bind();
-
-					float aspectRatio = (float)(core::Window::get_width()) / (float)(core::Window::get_height());
-					mml::Matrix4 projMat(1.0f);
-					mml::create_perspective_projection_matrix(projMat, 70.0f, aspectRatio, 0.1f, 2.5f);
 					
-					// common uniforms
+					// which face we want to cull?
+					material->isTwoSided() ? rendererCommands->cullFace(CullFace::None) : rendererCommands->cullFace(CullFace::Back);
+
+					rendererCommands->bindShader(shader);
+					if (renderMaterial)
+						rendererCommands->bindMaterial(material);
+
+					// Common uniforms
 					shader->setUniform("projectionMatrix", projectionMatrix);
 					shader->setUniform("viewMatrix", viewMatrix);
-					shader->setUniform("cameraPos", camera->getEntity()->getComponent<Transform>()->getPosition());
 					
-					// Set lighting uniforms
-					if (renderLighting) setLightingUniforms(shader, directionalLight);
-					// Set shadowing uniforms
-					if (renderShadows)	setShadowUniforms(rendererCommands, shader, directionalLight->getShadowCaster());
+					shader->setUniform("directionalLight_direction", directionalLight->getDirection());
+
+					if(shader->hasUniformLocation("cameraPos"))
+						shader->setUniform("cameraPos", camera->getEntity()->getComponent<Transform>()->getPosition());
 
 					shader->setUniform("time", (float)Time::get_time());
-					shader->setUniform("isTwoSided", (int)material->isTwoSided());
 
+					shader->setUniform("shadowProjMat", shadowCaster.getProjectionMatrix());
+					shader->setUniform("shadowViewMat", shadowCaster.getViewMatrix());
+
+					shader->setUniform("directionalLight_ambientColor", directionalLight->getAmbientColor());
+					shader->setUniform("directionalLight_color", directionalLight->getColor());
+
+					shader->setUniform("shadowProperties.shadowmapWidth", shadowmapFramebuffer->getWidth());
+					shader->setUniform("shadowProperties.pcfCount", 1);
+
+					// *->TEMP
+					shader->setUniform("texture_shadowmap", 4);
+					rendererCommands->bindTexture(shadowCaster.getShadowmapTexture(), 4);
+					
 					// Finally drawing..
 					rendererCommands->bindMesh(mesh);
+
+					const unsigned int meshInstanceCount = mesh->getInstanceCount();
 
 					// Update per instance transformations buffer only once..
 					if (!batch.second->instancedDataHandled)
@@ -144,49 +177,87 @@ namespace fungine
 					rendererCommands->drawIndices_instanced(mesh);
 					rendererCommands->unbindMesh(mesh);
 
-					renderMaterial ? rendererCommands->unbindMaterial(material) : shader->unbind();
+					// Unbind shadowmap texture
+					rendererCommands->unbindTexture(shadowCaster.getShadowmapTexture(), 4);
+
+					if (renderMaterial)
+						rendererCommands->unbindMaterial(material);
+
+					rendererCommands->unbindShader();
+				}
+			}
+
+			void NatureRenderer::renderShadows()
+			{
+				const RendererCommands* rendererCommands = Graphics::get_renderer_commands();
+				const ShadowCaster& shadowCaster = DirectionalLight::get_directional_light()->getShadowCaster();
+				
+				for (std::pair<std::shared_ptr<Mesh>, std::shared_ptr<BatchData>>& batch : _batches)
+				{
+#ifdef DEBUG__MODE_FULL
+					if (!batch.second)
+					{
+						Debug::log(
+							"Location: void NatureRenderer::renderShadows()\n"
+							"Mesh of a batch was nullptr!",
+							DEBUG__ERROR_LEVEL__ERROR
+						);
+						continue;
+					}
+#endif
+					Material* material = batch.second->material.get();
+					ShaderProgram* shader = material->getShadowShader();
+					Mesh* mesh = batch.second->mesh.get();
+					if (!shader || !mesh->hasShadows())
+						continue;
+
+					rendererCommands->bindShader(shader);
+					
+					// Common uniforms
+					shader->setUniform("projectionMatrix", shadowCaster.getProjectionMatrix());
+					shader->setUniform("viewMatrix", shadowCaster.getViewMatrix());
+
+					// Just a quick hack for now..
+					ShaderUniform<float>* uniform_windMultiplier = material->getShaderUniform_Float("m_windMultiplier");
+					if(uniform_windMultiplier)
+						shader->setUniform("m_windMultiplier", uniform_windMultiplier->data);
+					
+					shader->setUniform("time", (float)Time::get_time());
+
+					// Drawing..
+					rendererCommands->bindMesh(mesh);
+
+					const unsigned int meshInstanceCount = mesh->getInstanceCount();
+
+					// Update per instance transformations buffer only once..
+					if (!batch.second->instancedDataHandled)
+					{
+						// Transformation matrices
+						VertexBuffer<float>* instancedMatrixBuffer = mesh->getVertexBuffers()[1];
+						size_t transformationsBuffSize = sizeof(float) * 16 * meshInstanceCount;
+						instancedMatrixBuffer->update(0, transformationsBuffSize, batch.second->transformations);
+
+						// Wind properties
+						VertexBuffer<float>* instancedWindBuffer = mesh->getVertexBuffers()[2];
+						size_t windPropertyBuffSize = sizeof(float) * meshInstanceCount;
+						instancedWindBuffer->update(0, windPropertyBuffSize, batch.second->windProperties);
+
+						delete[] batch.second->transformations;
+						delete[] batch.second->windProperties;
+
+						batch.second->instancedDataHandled = true;
+					}
+
+					rendererCommands->drawIndices_instanced(mesh);
+					rendererCommands->unbindMesh(mesh);
+
+					rendererCommands->unbindShader();
 				}
 			}
 
 			void NatureRenderer::clear()
 			{
 			}
-
-			void NatureRenderer::setMaterialUniforms(
-				const graphics::RendererCommands* rendererCommands,
-				Material* material,
-				graphics::ShaderProgram* shader
-			) const
-			{
-
-				rendererCommands->bindMaterial(material);
-
-				// "bind texture units"
-				shader->setUniform("texture_diffuse", 0);
-
-				if (material->hasSpecularMap())
-					shader->setUniform("texture_specular", 1);
-
-				if (material->hasNormalMap())
-					shader->setUniform("texture_normal", 2);
-			}
-
-			void NatureRenderer::setLightingUniforms(
-				graphics::ShaderProgram* shader,
-				const DirectionalLight* directionalLight
-			) const
-			{
-				shader->setUniform("directionalLight_direction", directionalLight->getDirection());
-				shader->setUniform("directionalLight_ambientColor", directionalLight->getAmbientColor());
-				shader->setUniform("directionalLight_color", directionalLight->getColor());
-			}
-
-			void NatureRenderer::setShadowUniforms(
-				const graphics::RendererCommands* rendererCommands,
-				graphics::ShaderProgram* shader,
-				ShadowCaster& shadowCaster
-			) const
-			{}
 
 			void NatureRenderer::createNewBatch(entities::Entity* entity, std::shared_ptr<Material>& material, std::shared_ptr<Mesh>& mesh, bool createMeshCpy)
 			{
