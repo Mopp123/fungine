@@ -79,7 +79,7 @@ namespace fungine
 			mml::Vector4 points[4 + 4]; // 4 + 4 : nearplane + far plane vertices
 
 			const float aspectRatio = camera->getAspectRatio();
-			const float fov = 1.22173048f;//camera->getFov();
+			const float fov = camera->getFov();
 			const float zNear = camera->getZNear();
 			const float zFar = camera->getZFar();
 

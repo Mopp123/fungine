@@ -1,5 +1,8 @@
 
+#define _USE_MATH_DEFINES
+#include <math.h>
 #include "MyMathLib.h"
+
 
 namespace mml
 {
@@ -17,4 +20,9 @@ namespace mml
 		return l1 * p1.y + l2 * p2.y + l3 * p3.y;
 	}
 
+
+	float to_radians(float degrees)
+	{	
+		return (degrees * M_PI) / 180.0f;
+	}
 }

@@ -39,6 +39,7 @@ namespace fungine
 			glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, DEFAULT__OPENGL_VERSION_MAJOR);
 			glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, DEFAULT__OPENGL_VERSION_MINOR);
 			glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
+			glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 			glfwWindowHint(GLFW_VISIBLE, GLFW_TRUE);
 
 			_glfwWindowHandle = glfwCreateWindow(s_width, s_height, title, _isFullscreen ? glfwGetPrimaryMonitor() : NULL, NULL);

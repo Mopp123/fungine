@@ -144,7 +144,7 @@ namespace fungine
 					shader->setUniform("directionalLight_color", directionalLight->getColor());
 
 					shader->setUniform("shadowProperties.shadowmapWidth", shadowmapFramebuffer->getWidth());
-					shader->setUniform("shadowProperties.pcfCount", 1);
+					shader->setUniform("shadowProperties.pcfCount", 2);
 
 					// *->TEMP
 					shader->setUniform("texture_shadowmap", 4);

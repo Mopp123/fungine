@@ -13,7 +13,7 @@ namespace fungine
 		class Camera : public Component
 		{
 		private:
-			float _fov = 1.22173048f;
+			float _fov = 70.0f; // in radians
 			float _aspectRatio = 0.0f;
 			float _zNear = 0.0f;
 			float _zFar = 0.0f;
@@ -30,6 +30,7 @@ namespace fungine
 			Camera(const std::string& name = CAMERA_DEFAULT_NAME);
 			~Camera();
 
+			// *fov needs to be given in radians
 			void setPerspectiveProjection(float fov, float aspectRatio, float zNear, float zFar);
 			void setOrthographicProjection(float left, float right, float top, float bottom, float zNear, float zFar);
 

@@ -5,7 +5,7 @@
 #include "components/rendering/lighting/Lights.h"
 #include <vector>
 
-#define FOLIAGE_RENDERER__MAX_BATCH_SIZE 100000
+#define FOLIAGE_RENDERER__MAX_BATCH_SIZE 200000
 
 namespace fungine
 {

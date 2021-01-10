@@ -18,7 +18,7 @@ namespace fungine
 
 		public:
 
-			Program(const std::string& windowTitle, int windowWidth, int windowHeight, bool fullscreen = false);
+			Program(const std::string& windowTitle, int windowWidth, int windowHeight, bool fullscreen = false, int swapInterval = 1);
 			~Program();
 			bool isCloseRequested() const;
 

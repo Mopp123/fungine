@@ -13,4 +13,6 @@ namespace mml
 		const mml::Vector3& p3,
 		const mml::Vector2& pos
 	);
+
+	float to_radians(float degrees);
 }
