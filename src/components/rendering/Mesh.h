@@ -19,7 +19,7 @@ namespace fungine
 		protected:
 
 			std::vector<graphics::VertexBuffer<float>*> _vertexBuffers;
-			graphics::IndexBuffer* _indexBuffer;
+			graphics::IndexBuffer* _indexBuffer = nullptr;
 			graphics::DrawType _drawType;
 
 			int _instanceCount = 1;
@@ -34,7 +34,6 @@ namespace fungine
 
 
 		public:
-
 			Mesh(graphics::IndexBuffer* indexBuffer, graphics::DrawType drawType, unsigned int instanceCount = 1, const std::string& name = "", bool isStatic = false);
 			virtual ~Mesh();
 			virtual const size_t getSize() const override;
@@ -42,7 +41,8 @@ namespace fungine
 			virtual void addVertexBuffer(graphics::VertexBuffer<float>* buffer) {}
 
 			static std::shared_ptr<Mesh> create_mesh(std::vector<graphics::VertexBuffer<float>*> vertexBuffers, graphics::IndexBuffer* indexBuffer, graphics::DrawType drawType, unsigned int instanceCount = 1, const std::string& name = "", bool isStatic = false);
-			
+			static std::shared_ptr<Mesh> create_copy(const std::shared_ptr<Mesh>& m);
+
 			inline const std::vector<graphics::VertexBuffer<float>*>& getVertexBuffers() const { return _vertexBuffers; }
 			inline graphics::IndexBuffer* getIndexBuffer() { return _indexBuffer; }
 			inline const graphics::IndexBuffer* getIndexBuffer() const { return _indexBuffer; }

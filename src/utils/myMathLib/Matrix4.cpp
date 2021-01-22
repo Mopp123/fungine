@@ -267,6 +267,14 @@ namespace mml
 	{
 		return Matrix4(1.0f);
 	}
+	bool operator==(const Matrix4& left, const Matrix4& right)
+	{
+		return memcmp(left._m, right._m, sizeof(float) * 16) == 0;
+	}
+	bool operator!=(const Matrix4& left, const Matrix4& right)
+	{
+		return memcmp(left._m, right._m, sizeof(float) * 16) != 0;
+	}
 
 	// All specific matrix creation functions---------->
 	void create_orthographic_projection_matrix(

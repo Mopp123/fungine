@@ -67,14 +67,14 @@ namespace fungine
 				}
 			}
 
-			void OpenglRendererCommands::bindTexture(const Texture* texture, unsigned int slot) const
+			void OpenglRendererCommands::bindTexture(const Texture* const texture, unsigned int slot) const
 			{
 				GLenum glTextureSlot = GL_NONE;
 				convert_to_GLenum__texture_slot(slot, glTextureSlot);
 				GL_FUNC(glActiveTexture(glTextureSlot));
 				GL_FUNC(glBindTexture(GL_TEXTURE_2D, texture->getID()));
 			}
-			void OpenglRendererCommands::unbindTexture(const Texture* texture, unsigned int slot) const
+			void OpenglRendererCommands::unbindTexture(const Texture* const texture, unsigned int slot) const
 			{
 				GLenum glTextureSlot = GL_NONE;
 				convert_to_GLenum__texture_slot(slot, glTextureSlot);
@@ -117,7 +117,12 @@ namespace fungine
 				convert_to_GLenum__draw_type(mesh->getDrawType(), openglDrawType);
 				GL_FUNC(glDrawElementsInstanced(openglDrawType, mesh->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, NULL, mesh->getInstanceCount()));
 			}
-
+			void OpenglRendererCommands::drawIndices_instanced(const Mesh* const mesh, unsigned int instanceCount) const
+			{
+				GLenum openglDrawType = GL_NONE;
+				convert_to_GLenum__draw_type(mesh->getDrawType(), openglDrawType);
+				GL_FUNC(glDrawElementsInstanced(openglDrawType, mesh->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, NULL, instanceCount));
+			}
 
 			
 			

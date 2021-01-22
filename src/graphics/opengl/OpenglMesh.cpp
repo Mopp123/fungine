@@ -19,7 +19,11 @@ namespace fungine
 				GL_FUNC(glGenVertexArrays(1, &_vaoID));
 
 				GL_FUNC(glBindVertexArray(_vaoID));
-				GL_FUNC(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBuffer->getID()));
+				
+				if (_indexBuffer != nullptr)
+				{
+					GL_FUNC(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBuffer->getID()));
+				}
 
 				for (VertexBuffer<float>* vb : vertexBuffers)
 					addVertexBuffer(vb);
@@ -30,10 +34,11 @@ namespace fungine
 
 			OpenglMesh::~OpenglMesh()
 			{
+				GL_FUNC(glDeleteVertexArrays(1, &_vaoID));
 				Debug::notify_on_destroy("OpenglMesh");
 			}
 
-			void OpenglMesh::addVertexBuffer(graphics::VertexBuffer<float>* buffer)
+			void OpenglMesh::addVertexBuffer(VertexBuffer<float>* buffer)
 			{
 				GL_FUNC(glBindBuffer(GL_ARRAY_BUFFER, buffer->getID()));
 

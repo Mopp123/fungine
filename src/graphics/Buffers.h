@@ -83,13 +83,10 @@ namespace fungine
 		{
 		protected:
 			unsigned int _id = 0;
-			T* _data;
+			T* _data = nullptr;
 			size_t _dataSize;
 			VertexBufferLayout _layout;
-
-			// We allow VertexBuffer creation only through the function "create_vertex_buffer".
-			//	-> make operator new inaccessable for outsiders
-			void* operator new(size_t);
+			BufferUsage _usage;
 
 		public:
 			VertexBuffer(T* data, size_t dataSize, BufferUsage usage, const VertexBufferLayout& layout);
@@ -103,7 +100,9 @@ namespace fungine
 
 			inline const unsigned int& getID() const { return _id; }
 			inline const T* getData() const { return  _data; }
+			inline size_t getDataSize() const { return _dataSize; }
 			inline const VertexBufferLayout& getLayout() const { return  _layout; }
+			inline const BufferUsage& getUsage() const { return _usage; }
 		};
 
 		class IndexBuffer

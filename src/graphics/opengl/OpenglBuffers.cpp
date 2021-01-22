@@ -20,7 +20,7 @@ namespace fungine
 				GLenum bufferUsage = GL_NONE;
 				convert_to_GLenum__buffer_usage(usage, bufferUsage);
 
-				GL_FUNC(glGenBuffers(1, &this->_id));
+				GL_FUNC(glGenBuffers(1, &(this->_id)));
 				GL_FUNC(glBindBuffer(GL_ARRAY_BUFFER, this->_id));
 
 				GL_FUNC(glBufferData(GL_ARRAY_BUFFER, dataSize, data, bufferUsage));
@@ -31,7 +31,7 @@ namespace fungine
 			template<typename T>
 			OpenglVertexBuffer<T>::~OpenglVertexBuffer()
 			{
-				glDeleteBuffers(1, &this->_id);
+				glDeleteBuffers(1, &(this->_id));
 				Debug::notify_on_destroy("OpenglVertexBuffer");
 			}
 
@@ -40,8 +40,8 @@ namespace fungine
 			template<typename T>
 			void OpenglVertexBuffer<T>::update(int offset, size_t dataSize, const void* data)
 			{
-				glBindBuffer(GL_ARRAY_BUFFER, this->_id);
-				glBufferSubData(GL_ARRAY_BUFFER, offset, dataSize, data);
+				GL_FUNC(glBindBuffer(GL_ARRAY_BUFFER, this->_id));
+				GL_FUNC(glBufferSubData(GL_ARRAY_BUFFER, offset, dataSize, data));
 			}
 
 			OpenglIndexBuffer::OpenglIndexBuffer(const std::vector<unsigned int>& data) :

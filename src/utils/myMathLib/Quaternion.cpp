@@ -105,4 +105,15 @@ namespace mml
 	{
 		return Quaternion(left.x * right, left.y * right, left.z * right, left.w * right);
 	}
+
+	bool operator==(const Quaternion& left, const Quaternion& right)
+	{
+		return left.x == right.x && left.y == right.y && left.z == right.z && left.w == right.w;
+	}
+	
+	bool operator!=(const Quaternion& left, const Quaternion& right)
+	{
+		return !(left == right);
+	}
+
 }

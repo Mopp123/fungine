@@ -35,5 +35,8 @@ namespace mml
 		friend Vector3 operator*(const Vector3& left, const Vector3& right);
 		friend Vector3 operator*(const Vector3& left, float right);
 
+		friend bool operator==(const Vector3& left, const Vector3& right);
+		friend bool operator!=(const Vector3& left, const Vector3& right);
+
 	};
 }

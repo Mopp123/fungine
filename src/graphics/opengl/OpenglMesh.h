@@ -13,7 +13,7 @@ namespace fungine
 			public:
 
 				OpenglMesh(std::vector<VertexBuffer<float>*> vertexBuffers, IndexBuffer* indexBuffer, graphics::DrawType drawType, unsigned int instanceCount, const std::string& name = "", bool isStatic = false);
-				~OpenglMesh();
+				virtual ~OpenglMesh();
 
 				virtual void addVertexBuffer(graphics::VertexBuffer<float>* buffer) override;
 

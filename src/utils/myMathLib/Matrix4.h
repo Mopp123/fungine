@@ -38,12 +38,15 @@ namespace mml
 
 		void print() const;
 
+		inline float* getRawArr() { return _m; }
 		float& operator[](int i);
 		const float& operator[](int i) const; // I have no idea is this kind of duplication legal??
 
 		friend Matrix4 operator*(const Matrix4& left, const Matrix4& right);
 		friend Vector4 operator*(const Matrix4& left, const Vector4& right);
 		friend Matrix4 operator*(const Matrix4& left, float val);
+		friend bool operator==(const Matrix4& left, const Matrix4& right);
+		friend bool operator!=(const Matrix4& left, const Matrix4& right);
 
 	};
 

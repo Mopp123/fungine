@@ -57,4 +57,14 @@ namespace mml
 	{
 		return Vector3(left.x * right, left.y * right, left.z * right);
 	}
+
+	bool operator==(const Vector3& left, const Vector3& right)
+	{
+		return left.x == right.x && left.y == right.y && left.z == right.z;
+	}
+	bool operator!=(const Vector3& left, const Vector3& right)
+	{
+		return !(left == right);
+	}
+
 }

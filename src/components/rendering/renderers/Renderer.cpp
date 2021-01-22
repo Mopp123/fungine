@@ -14,11 +14,28 @@ namespace fungine
 	{
 		namespace rendering
 		{
+			
+			BatchInstanceData::BatchInstanceData(unsigned int position, unsigned int batchIndex, float** buff, float* buffToTrack, unsigned int buffElemLength) :
+				Component("EntityBatchData", true), position(position), batchIndex(batchIndex), buffElemLength(buffElemLength)
+			{
+				buffer = buff;
+				bufferToTrack = buffToTrack;
+			}
+			BatchInstanceData::~BatchInstanceData()
+			{}
+
+
+			void BatchInstanceData::update()
+			{
+				memcpy(*buffer + position * buffElemLength, &bufferToTrack[0], sizeof(float) * buffElemLength);
+			}
+
+
 			std::vector<Renderer*> Renderer::s_allRenderers;
 			Framebuffer* Renderer::s_framebuffer = nullptr;
 
 			Renderer::Renderer(const std::string& name) :
-				Component(name)
+				Component(name, false, true)
 			{
 				if (!s_framebuffer)
 					s_framebuffer = Framebuffer::create_framebuffer(core::Window::get_width(), core::Window::get_height(), true);

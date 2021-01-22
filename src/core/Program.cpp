@@ -37,14 +37,18 @@ namespace fungine
 		using namespace components;
 		void Program::update()
 		{
+			unsigned int updated = 0;
 			// !!!!!!!!!!!!!! This is done just temporarely here !!!!!!!!!!!!!!!!!! *->TEMP
-			for (Component* c : Component::s_allComponentsPool) // *NOTE: remember the "pointer invalidation shit thing" if u try to access this vector, if it has changed in this update at some point.. then all those pointers are inaccessable..
+			for (int i = 0; i < Component::s_updateableComponentsPool.size(); ++i) // *NOTE: remember the vector iterator/ptr/ref invalidation when the vector's size changes
 			{
-				size_t dynamicComponentCount = Component::s_allComponentsPool.size();
+				Component* c = Component::s_updateableComponentsPool[i];
 				if (c)
 				{
 					if (c->_isActive)
+					{
 						c->update();
+						updated++;
+					}
 				}
 			}
 			_window->swapBuffers();

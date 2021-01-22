@@ -12,25 +12,23 @@ namespace fungine
 		// instantiate templates for buffers explicitly
 		template class VertexBuffer<float>;
 
-		// We allow VertexBuffer creation only through the function "create_vertex_buffer".
-		//	-> make operator new inaccessable for outsiders
-		template<typename T>
-		void* VertexBuffer<T>::operator new(size_t size)
-		{
-			return malloc(size);
-		}
-
 		template<typename T>
 		VertexBuffer<T>::VertexBuffer(T* data, size_t dataSize, BufferUsage usage, const VertexBufferLayout& layout) :
-			_layout(layout)
+			_dataSize(dataSize), _layout(layout), _usage(usage)
 		{
-			_data = data;
-			_dataSize = dataSize;
+			_data = new T[_dataSize];
+			memcpy(_data, data, _dataSize);
 		}
 
 		template<typename T>
 		VertexBuffer<T>::~VertexBuffer()
-		{}
+		{
+			if (_data)
+			{
+				delete[] _data;
+				_data = nullptr;
+			}
+		}
 
 		template<typename T>
 		VertexBuffer<T>* VertexBuffer<T>::create_vertex_buffer(T* data, size_t dataSize, BufferUsage usage, const VertexBufferLayout& layout)

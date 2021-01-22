@@ -15,7 +15,7 @@ namespace fungine
 			{
 			public:
 				OpenglVertexBuffer(T* data, size_t dataSize, BufferUsage usage, const VertexBufferLayout& layout);
-				~OpenglVertexBuffer();
+				virtual ~OpenglVertexBuffer();
 
 				// Updates the buffer starting from "offset" with new data
 				// Mesh which owns this buffer, must be bound when calling this.
@@ -27,7 +27,7 @@ namespace fungine
 			{
 			public:
 				OpenglIndexBuffer(const std::vector<unsigned int>& data);
-				~OpenglIndexBuffer();
+				virtual ~OpenglIndexBuffer();
 			};
 		}
 	}

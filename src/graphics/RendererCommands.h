@@ -49,12 +49,13 @@ namespace fungine
 			virtual void bindShader(ShaderProgram* shader) const = 0;
 			virtual void unbindShader() const = 0; // kind of pointless?
 			virtual void cullFace(CullFace face) const = 0;
-			virtual void bindTexture(const Texture* texture, unsigned int slot) const = 0;
-			virtual void unbindTexture(const Texture* texture, unsigned int slot) const = 0;
+			virtual void bindTexture(const Texture* const texture, unsigned int slot) const = 0;
+			virtual void unbindTexture(const Texture* const texture, unsigned int slot) const = 0;
 			virtual void bindMesh(const components::Mesh* const mesh) const = 0;
 			virtual void unbindMesh(const components::Mesh* const mesh) const = 0;
 			virtual void drawIndices(const components::Mesh* const mesh) const = 0;
 			virtual void drawIndices_instanced(const components::Mesh* const mesh) const = 0;
+			virtual void drawIndices_instanced(const components::Mesh* const mesh, unsigned int instanceCount) const = 0;
 
 			virtual void bindMaterial(components::Material* const material) const = 0;
 			virtual void unbindMaterial(const components::Material* const material) const = 0;

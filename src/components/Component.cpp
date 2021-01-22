@@ -6,30 +6,21 @@ namespace fungine
 {
 	namespace components
 	{
-		std::vector<Component*> Component::s_allComponentsPool;
-		std::vector<Component*> Component::s_allStaticComponentsPool;
+		std::vector<Component*> Component::s_updateableComponentsPool;
 
-		Component::Component(const std::string& name, bool isStatic) : 
-			_name(name), _isStatic(isStatic)
+		Component::Component(const std::string& name, bool isStatic, bool hasUpdateFunc) :
+			_name(name), _isStatic(isStatic), _hasUpdateFunc(hasUpdateFunc)
 		{
-			if (!_isStatic)
+			if (_hasUpdateFunc)
 			{
-				_id = s_allComponentsPool.size();
-				add_to_dynamic_list(s_allComponentsPool, this);
-			}
-			else
-			{
-				_id = s_allStaticComponentsPool.size();
-				add_to_dynamic_list(s_allStaticComponentsPool, this);
+				add_to_dynamic_list(s_updateableComponentsPool, this);
 			}
 		}
 
 		Component::~Component()
 		{
-			if(!_isStatic)
-				s_allComponentsPool.erase(std::find(s_allComponentsPool.begin(), s_allComponentsPool.end(), this)); // Not sure if this works?
-			else
-				s_allStaticComponentsPool.erase(std::find(s_allStaticComponentsPool.begin(), s_allStaticComponentsPool.end(), this)); // Not sure if this works?
+			if(_hasUpdateFunc)
+				s_updateableComponentsPool.erase(std::find(s_updateableComponentsPool.begin(), s_updateableComponentsPool.end(), this)); // Not sure if this works?
 		}
 	}
 }

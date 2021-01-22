@@ -19,7 +19,7 @@ namespace fungine
 
 		public:
 			Light(const mml::Vector3& color, const mml::Vector3& ambientColor, const std::string& name = LIGHT_DEFAULT_NAME) : 
-				Component(name), _color(color), _ambientColor(ambientColor)
+				Component(name, false, true), _color(color), _ambientColor(ambientColor)
 			{}
 			virtual ~Light() {}
 

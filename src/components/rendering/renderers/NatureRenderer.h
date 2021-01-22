@@ -13,11 +13,13 @@ namespace fungine
 	{
 		namespace rendering
 		{
-			struct BatchData
+			struct BatchData_NatureRendering
 			{
 				std::shared_ptr<Mesh> mesh;
 				std::shared_ptr<Material> material;
 				float* transformations = nullptr;
+				bool transformationsBuffUpdated = false;
+
 				unsigned int staticArrDataPtr_transformations = 0;
 
 				float* windProperties = nullptr;
@@ -26,24 +28,27 @@ namespace fungine
 				unsigned int instanceCount = 0;
 				bool instancedDataHandled = false;
 
-				BatchData(std::shared_ptr<Material>& batchMaterial, size_t maxInstanceCount)
+
+				BatchData_NatureRendering(std::shared_ptr<Material>& batchMaterial, size_t maxInstanceCount)
 				{
 					material = batchMaterial;
 					transformations = new float[16 * maxInstanceCount];
 					windProperties = new float[maxInstanceCount];
 				}
-				~BatchData()
+				~BatchData_NatureRendering()
 				{
-					if(transformations) delete[] transformations;
-					if(windProperties)	delete[] windProperties;
+					delete[] transformations;
+					delete[] windProperties;
+
+					printf("Batch destroyed!\n");
 				}
 			};
 
 			class NatureRenderer : public Renderer
 			{
 			private:
-				std::vector<std::pair<std::shared_ptr<Mesh>, std::shared_ptr<BatchData>>> _batches;
-				bool _lockSubmitting = false;
+				std::vector<std::pair<std::shared_ptr<Mesh>, std::shared_ptr<BatchData_NatureRendering>>> _batches;
+				//bool _lockSubmitting = false;
 
 			public:
 				NatureRenderer();
@@ -69,11 +74,11 @@ namespace fungine
 
 			private:
 
-				void createNewBatch(entities::Entity* entity, std::shared_ptr<Material>& material, std::shared_ptr<Mesh>& mesh, bool createMeshCpy);
-				void addToBatch(entities::Entity* entity, BatchData& batch);
+				std::shared_ptr<BatchData_NatureRendering> createNewBatch(std::shared_ptr<Material>& material, std::shared_ptr<Mesh>& mesh);
+				void addToBatch(entities::Entity* entity, BatchData_NatureRendering& batch);
 			
-				void addToTransformsBuff(BatchData& batch, const mml::Matrix4& transformationMatrix);
-				void addToWindInitValsBuff(BatchData& batch);
+				void addToTransformsBuff(BatchData_NatureRendering& batch, const mml::Matrix4& transformationMatrix);
+				void addToWindInitValsBuff(BatchData_NatureRendering& batch);
 			};
 		}
 	}

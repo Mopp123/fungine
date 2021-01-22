@@ -14,7 +14,7 @@ namespace fungine
 		Camera* Camera::s_currentCamera = nullptr;
 
 		Camera::Camera(const std::string& name) :
-			Component(name)
+			Component(name, false, true)
 		{
 			// *->TEMP just temporarely make current camera the lastly created camera
 			s_currentCamera = this;

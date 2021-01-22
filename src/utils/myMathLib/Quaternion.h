@@ -27,5 +27,8 @@ namespace mml
 		friend Quaternion operator*(const Quaternion& left, const Quaternion& right);
 		friend Quaternion operator*(const Quaternion& left, const Vector3& right);
 		friend Quaternion operator*(const Quaternion& left, float right);
+
+		friend bool operator==(const Quaternion& left, const Quaternion& right);
+		friend bool operator!=(const Quaternion& left, const Quaternion& right);
 	};
 }

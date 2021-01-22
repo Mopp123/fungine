@@ -21,9 +21,6 @@ namespace fungine
 		class Material : public Component
 		{
 		private:
-
-
-
 			graphics::Texture* _textures[MATERIAL__MAX_TEXTURES] = { nullptr };
 			graphics::ShaderProgram* _shader = nullptr;
 			// *Optinal shader to be used for shadowmap rendering.

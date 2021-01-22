@@ -10,6 +10,7 @@
 #include "components/rendering/renderers/Renderer.h"
 #include "components/rendering/renderers/TerrainRenderer.h"
 #include "components/rendering/renderers/NatureRenderer.h"
+#include "components/guiComponents/GUIImage.h"
 
 
 namespace fungine
@@ -20,7 +21,8 @@ namespace fungine
 	namespace entities
 	{
 
-		Entity::Entity()
+		Entity::Entity(bool isStatic) : 
+			_isStatic(isStatic)
 		{}
 		Entity::~Entity()
 		{
@@ -42,8 +44,10 @@ namespace fungine
 		template std::shared_ptr<Camera>			Entity::getComponent<Camera>();
 		template std::shared_ptr<DirectionalLight>	Entity::getComponent<DirectionalLight>();
 		template std::shared_ptr<Renderer>			Entity::getComponent<Renderer>();
+		template std::shared_ptr<BatchInstanceData>	Entity::getComponent<BatchInstanceData>();
 		template std::shared_ptr<TerrainRenderer>	Entity::getComponent<TerrainRenderer>();
 		template std::shared_ptr<NatureRenderer>	Entity::getComponent<NatureRenderer>();
+		template std::shared_ptr<GUIImage>			Entity::getComponent<GUIImage>();
 
 		template std::vector<std::shared_ptr<Transform>>		Entity::getComponents<Transform>();
 		template std::vector<std::shared_ptr<Mesh>>				Entity::getComponents<Mesh>();
@@ -51,8 +55,10 @@ namespace fungine
 		template std::vector<std::shared_ptr<Camera>>			Entity::getComponents<Camera>();
 		template std::vector<std::shared_ptr<DirectionalLight>> Entity::getComponents<DirectionalLight>();
 		template std::vector<std::shared_ptr<Renderer>>			Entity::getComponents<Renderer>();
+		template std::vector<std::shared_ptr<BatchInstanceData>>Entity::getComponents<BatchInstanceData>();
 		template std::vector<std::shared_ptr<TerrainRenderer>>	Entity::getComponents<TerrainRenderer>();
 		template std::vector<std::shared_ptr<NatureRenderer>>	Entity::getComponents<NatureRenderer>();
+		template std::vector<std::shared_ptr<GUIImage>>			Entity::getComponents<GUIImage>();
 
 
 		// Returns first component of type T

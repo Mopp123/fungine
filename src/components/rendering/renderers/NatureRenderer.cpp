@@ -24,6 +24,8 @@ namespace fungine
 			{
 				if (!s_framebuffer)
 					s_framebuffer = Framebuffer::create_framebuffer(core::Window::get_width(), core::Window::get_height(), true);
+
+				_entitiesChanged = true;
 			}
 
 			NatureRenderer::~NatureRenderer()
@@ -31,38 +33,43 @@ namespace fungine
 			
 			void NatureRenderer::update()
 			{
-				if (!_lockSubmitting)
+				if (_entitiesChanged)
 				{
 					for (Entity* e : _entities)
 						submit(e);
 
-					_lockSubmitting = true;
+					_entitiesChanged = false;
 				}
 			}
 
 			void NatureRenderer::submit(Entity* entity)
 			{
 				std::shared_ptr<Mesh> mesh = entity->getComponent<Mesh>();
-				std::shared_ptr<Material> material = entity->getComponent<Material>();
-
-				bool createNewMeshCpy = false;
-				for (std::pair<std::shared_ptr<Mesh>, std::shared_ptr<BatchData>>& batch : _batches)
+				std::shared_ptr<BatchInstanceData> entityBatchData = entity->getComponent<BatchInstanceData>();
+				
+				// If this entity haven't been added to a batch yet?
+				//	-> Attempt to find a suitable batch for it
+				if (!entityBatchData)
 				{
-					if (batch.first == mesh)
+					std::shared_ptr<Transform> entityTransform = entity->getComponent<Transform>();
+				
+					std::shared_ptr<Material> material = entity->getComponent<Material>();
+
+					for (std::pair<std::shared_ptr<Mesh>, std::shared_ptr<BatchData_NatureRendering>>& batch : _batches)
 					{
-						if (batch.second->instanceCount < batch.first->getInstanceCount())
+						if (batch.first == mesh)
 						{
-							addToBatch(entity, *batch.second);
-							return;
-						}
-						else
-						{
-							createNewMeshCpy = true;
+							if (batch.second->instanceCount < batch.first->getInstanceCount())
+							{
+								addToBatch(entity, *batch.second);
+								return;
+							}
 						}
 					}
-				}
 
-				createNewBatch(entity, material, mesh, createNewMeshCpy);
+					std::shared_ptr<BatchData_NatureRendering> newBatch = createNewBatch(material, mesh);
+					addToBatch(entity, *newBatch);
+				}
 			}
 
 			void NatureRenderer::render(
@@ -98,7 +105,7 @@ namespace fungine
 					return;
 				}
 #endif
-				for (std::pair<std::shared_ptr<Mesh>, std::shared_ptr<BatchData>>& batch : _batches)
+				for (std::pair<std::shared_ptr<Mesh>, std::shared_ptr<BatchData_NatureRendering>>& batch : _batches)
 				{
 #ifdef DEBUG__MODE_FULL
 					if (!batch.second)
@@ -155,21 +162,29 @@ namespace fungine
 
 					const unsigned int meshInstanceCount = mesh->getInstanceCount();
 
-					// Update per instance transformations buffer only once..
+					
+					// Transformation matrices
+					if (!batch.second->transformationsBuffUpdated)
+					{
+						VertexBuffer<float>* instancedMatrixBuffer = mesh->getVertexBuffers()[1];
+						instancedMatrixBuffer->update(0, sizeof(float) * 16 * meshInstanceCount, batch.second->transformations);
+						batch.second->transformationsBuffUpdated = true;
+					}
+					else
+					{
+						batch.second->transformationsBuffUpdated = false;
+					}
+					
+					// Update the wind instanced data only once
 					if (!batch.second->instancedDataHandled)
 					{
-						// Transformation matrices
-						VertexBuffer<float>* instancedMatrixBuffer = mesh->getVertexBuffers()[1];
-						size_t transformationsBuffSize = sizeof(float) * 16 * meshInstanceCount;
-						instancedMatrixBuffer->update(0, transformationsBuffSize, batch.second->transformations);
-
 						// Wind properties
 						VertexBuffer<float>* instancedWindBuffer = mesh->getVertexBuffers()[2];
 						size_t windPropertyBuffSize = sizeof(float) * meshInstanceCount;
 						instancedWindBuffer->update(0, windPropertyBuffSize, batch.second->windProperties);
 
-						delete[] batch.second->transformations;
-						delete[] batch.second->windProperties;
+						//delete[] batch.second->transformations;
+						//delete[] batch.second->windProperties;
 
 						batch.second->instancedDataHandled = true;
 					}
@@ -187,12 +202,13 @@ namespace fungine
 				}
 			}
 
+
 			void NatureRenderer::renderShadows()
 			{
 				const RendererCommands* rendererCommands = Graphics::get_renderer_commands();
 				const ShadowCaster& shadowCaster = DirectionalLight::get_directional_light()->getShadowCaster();
 				
-				for (std::pair<std::shared_ptr<Mesh>, std::shared_ptr<BatchData>>& batch : _batches)
+				for (std::pair<std::shared_ptr<Mesh>, std::shared_ptr<BatchData_NatureRendering>>& batch : _batches)
 				{
 #ifdef DEBUG__MODE_FULL
 					if (!batch.second)
@@ -229,21 +245,28 @@ namespace fungine
 
 					const unsigned int meshInstanceCount = mesh->getInstanceCount();
 
-					// Update per instance transformations buffer only once..
-					if (!batch.second->instancedDataHandled)
+					// Transformation matrices
+					if (!batch.second->transformationsBuffUpdated)
 					{
-						// Transformation matrices
 						VertexBuffer<float>* instancedMatrixBuffer = mesh->getVertexBuffers()[1];
-						size_t transformationsBuffSize = sizeof(float) * 16 * meshInstanceCount;
-						instancedMatrixBuffer->update(0, transformationsBuffSize, batch.second->transformations);
+						instancedMatrixBuffer->update(0, sizeof(float) * 16 * meshInstanceCount, batch.second->transformations);
+						batch.second->transformationsBuffUpdated = true;
+					}
+					else
+					{
+						batch.second->transformationsBuffUpdated = false;
+					}
 
+					// Update the wind instanced data only once
+					if (!batch.second->instancedDataHandled)
+					{	
 						// Wind properties
 						VertexBuffer<float>* instancedWindBuffer = mesh->getVertexBuffers()[2];
 						size_t windPropertyBuffSize = sizeof(float) * meshInstanceCount;
 						instancedWindBuffer->update(0, windPropertyBuffSize, batch.second->windProperties);
 
-						delete[] batch.second->transformations;
-						delete[] batch.second->windProperties;
+						//delete[] batch.second->transformations;
+						//delete[] batch.second->windProperties;
 
 						batch.second->instancedDataHandled = true;
 					}
@@ -257,38 +280,18 @@ namespace fungine
 
 			void NatureRenderer::clear()
 			{
+				//_batches.clear();
 			}
 
-			void NatureRenderer::createNewBatch(entities::Entity* entity, std::shared_ptr<Material>& material, std::shared_ptr<Mesh>& mesh, bool createMeshCpy)
+			std::shared_ptr<BatchData_NatureRendering> NatureRenderer::createNewBatch(std::shared_ptr<Material>& material, std::shared_ptr<Mesh>& mesh)
 			{
 				printf("Creating new batch!\n");
 
-				std::shared_ptr<BatchData> newBatch = std::make_shared<BatchData>(material, mesh->getInstanceCount());
-				
-				if (createMeshCpy)
-				{
-					newBatch->mesh = Mesh::create_mesh(
-						mesh->getVertexBuffers(),
-						mesh->getIndexBuffer(),
-						DrawType::Triangles,
-						mesh->getInstanceCount(),
-						"",
-						true
-					);
-				}
-				else
-				{
-					newBatch->mesh = mesh;
-				}
-				
-				// Create the per instance transformations buffer (Matrix4)
-				std::shared_ptr<Transform> transform = entity->getComponent<Transform>();
-				transform->update();
-				
-				addToTransformsBuff(*newBatch.get(), transform->getTransformationMatrix());
+				std::shared_ptr<BatchData_NatureRendering> newBatch = std::make_shared<BatchData_NatureRendering>(material, mesh->getInstanceCount());
+				newBatch->mesh = Mesh::create_copy(mesh);
 
 				// Create the actual vertex buffer for that..
-				size_t transformationsBuffLength = 16 * newBatch->mesh->getInstanceCount();
+				int transformationsBuffLength = 16 * newBatch->mesh->getInstanceCount();
 				VertexBufferLayout transformationsBuffLayout({
 					{ 4, ShaderDataType::Float4, true },
 					{ 5, ShaderDataType::Float4, true },
@@ -298,12 +301,12 @@ namespace fungine
 				VertexBuffer<float>* perInstanceTransformationsBuffer = VertexBuffer<float>::create_vertex_buffer(
 					newBatch->transformations, 
 					sizeof(float) * transformationsBuffLength, 
-					BufferUsage::StaticDraw, 
+					BufferUsage::StreamDraw, 
 					transformationsBuffLayout
 				);
 
 				// Create per instance "wind properties buffer"
-				size_t windPropertiesBuffLength = newBatch->mesh->getInstanceCount();
+				int windPropertiesBuffLength = newBatch->mesh->getInstanceCount();
 				VertexBufferLayout windBufferLayout({
 					{ 8, ShaderDataType::Float, true }
 				});
@@ -324,26 +327,33 @@ namespace fungine
 				newBatch->mesh->addVertexBuffer(perInstanceWindBuffer);
 				rc->unbindMesh(newBatch->mesh.get());
 
-				addToWindInitValsBuff(*newBatch);
-
-				newBatch->instanceCount++;
 				_batches.push_back(std::make_pair(mesh, newBatch));
+				return newBatch;
 			}
 
-			void NatureRenderer::addToBatch(entities::Entity* entity, BatchData& batch)
+			void NatureRenderer::addToBatch(entities::Entity* entity, BatchData_NatureRendering& batch)
 			{
 				std::shared_ptr<Transform> transform = entity->getComponent<Transform>();
-				transform->update();
-				mml::Matrix4 transformationMatrix = transform->getTransformationMatrix();
+
+				float* buffToTrack = transform->getTransformationMatrixBuff();
+
+				std::shared_ptr<BatchInstanceData> entityBatchData = std::make_shared<BatchInstanceData>(
+					batch.instanceCount,
+					_batches.size() - 1,
+					&batch.transformations,
+					buffToTrack,
+					16
+				);
+				entity->addComponent(entityBatchData);
 				
+				transform->update();
 				addToTransformsBuff(batch, transform->getTransformationMatrix());
 				addToWindInitValsBuff(batch);
-
 				batch.instanceCount++;
 			}
 
 			// *May be wrong!?
-			void NatureRenderer::addToTransformsBuff(BatchData& batch, const mml::Matrix4& transformationMatrix)
+			void NatureRenderer::addToTransformsBuff(BatchData_NatureRendering& batch, const mml::Matrix4& transformationMatrix)
 			{
 				unsigned int& ptr = batch.staticArrDataPtr_transformations;
 				if (ptr < batch.mesh->getInstanceCount() * 16)
@@ -354,7 +364,7 @@ namespace fungine
 					ptr += 16;
 				}
 			}
-			void NatureRenderer::addToWindInitValsBuff(BatchData& batch)
+			void NatureRenderer::addToWindInitValsBuff(BatchData_NatureRendering& batch)
 			{
 				unsigned int& ptr = batch.staticArrDataPtr_wind;
 				if (ptr < batch.mesh->getInstanceCount())
@@ -363,7 +373,6 @@ namespace fungine
 					ptr++;
 				}
 			}
-
 
 			const size_t NatureRenderer::getSize() const
 			{
