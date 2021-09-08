@@ -23,6 +23,7 @@ namespace fungine
 
 			// *Note: Pass by copying to increase component ptr's ref count ON PURPOSE(because entities can share components)
 			void addComponent(std::shared_ptr<components::Component> component);
+			void removeComponent(std::shared_ptr<components::Component> component);
 
 			// Returns first component of type T
 			template<typename T>

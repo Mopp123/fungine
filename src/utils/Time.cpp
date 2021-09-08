@@ -26,7 +26,7 @@ namespace fungine
 		if (glfwGetTime() - s_fpsStartTime > 0.25 && s_frames > 10)
 		{
 			s_fps = (double)(s_frames) / (glfwGetTime() - s_fpsStartTime);
-			printf("Fps: %f		Delta: %f\n", s_fps, s_deltaTime);
+			//printf("Fps: %f		Delta: %f\n", s_fps, s_deltaTime);
 			s_fpsStartTime = glfwGetTime();
 			s_frames = 0;
 		}

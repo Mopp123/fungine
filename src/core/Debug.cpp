@@ -19,9 +19,10 @@ namespace fungine
 		printf("%s\n", message.c_str());
 	}
 
-
 	void Debug::notify_on_destroy(const std::string& objName)
 	{
+#ifdef DEBUG__MODE_FULL
 		log(objName + " destroyed!");
+#endif
 	}
 }

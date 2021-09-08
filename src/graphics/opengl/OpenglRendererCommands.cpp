@@ -30,6 +30,9 @@ namespace fungine
 				}
 				clear();
 				GL_FUNC(glClearColor(_clearColor.x, _clearColor.y, _clearColor.z, _clearColor.w));
+
+				// Disable because text rendering..
+				GL_FUNC(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
 			}
 
 			void OpenglRendererCommands::clear() const

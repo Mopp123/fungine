@@ -64,6 +64,12 @@ namespace fungine
 				TextureWrapping texWrapMode_s = TextureWrapping::Repeat, TextureWrapping texWrapMode_t = TextureWrapping::Repeat,
 				TextureFiltering texFilteringMode_min = TextureFiltering::LinearMipmap, TextureFiltering texFilteringMode_mag = TextureFiltering::Linear
 			);
+			// This is ment mainly for textures used in 2d rendering (no mipmapping enabled)
+			static Texture* create_texture(
+				const ImageData* imgData,
+				TextureWrapping texWrapMode_s, TextureWrapping texWrapMode_t,
+				TextureFiltering texFilteringMode
+			);
 
 			// Updates the texture to look like its' image data
 			// If texture's underlying image data changes, the texture wont look any different, until this function is called!
@@ -71,6 +77,27 @@ namespace fungine
 
 			inline const unsigned int& getID() const { return _id; }
 			inline void setImageData(const ImageData* imgData) { _imageData = imgData; }
+		};
+
+
+		class TextureAtlas
+		{
+		private:
+			Texture* _texture = nullptr;
+			int _tileCount = 1;
+
+		public:
+
+			TextureAtlas(
+				const ImageData* imgdata, int tileCount,
+
+				TextureWrapping texWrapMode_s, TextureWrapping texWrapMode_t,
+				TextureFiltering texFilteringMode
+			);
+			~TextureAtlas();
+
+			inline const Texture * const getTexture() const { return _texture; }
+			inline int getTileCount() const { return _tileCount; }
 		};
 	}
 }

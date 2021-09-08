@@ -5,8 +5,6 @@
 #include "components/rendering/lighting/Lights.h"
 #include <vector>
 
-#define FOLIAGE_RENDERER__MAX_BATCH_SIZE 200000
-
 namespace fungine
 {
 	namespace components
@@ -27,7 +25,6 @@ namespace fungine
 
 				unsigned int instanceCount = 0;
 				bool instancedDataHandled = false;
-
 
 				BatchData_NatureRendering(std::shared_ptr<Material>& batchMaterial, size_t maxInstanceCount)
 				{
@@ -74,7 +71,7 @@ namespace fungine
 
 			private:
 
-				std::shared_ptr<BatchData_NatureRendering> createNewBatch(std::shared_ptr<Material>& material, std::shared_ptr<Mesh>& mesh);
+				std::shared_ptr<BatchData_NatureRendering>& createNewBatch(std::shared_ptr<Material>& material, std::shared_ptr<Mesh>& mesh);
 				void addToBatch(entities::Entity* entity, BatchData_NatureRendering& batch);
 			
 				void addToTransformsBuff(BatchData_NatureRendering& batch, const mml::Matrix4& transformationMatrix);

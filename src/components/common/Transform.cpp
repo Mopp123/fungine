@@ -9,8 +9,11 @@ namespace fungine
 	{
 
 		Transform::Transform(const mml::Vector3& pos, const mml::Quaternion& rot, const mml::Vector3& scale) :
-			Component(DEFAULT_NAME_TRANSFORM, true), _localPosition(pos), _localRotation(rot), _localScale(scale)
+			Component(DEFAULT_NAME_TRANSFORM, true)
 		{
+			setPosition(pos);
+			setRotation(rot);
+			setScale(scale);
 			createTransformationMatrix();
 			_hasChanged = false;
 		}
@@ -98,6 +101,11 @@ namespace fungine
 			);
 		}
 
+		void Transform::setParent(Transform* p)
+		{
+			_parent = p;
+			_hasChanged = true;
+		}
 		void Transform::setPosition(const mml::Vector3& pos) 
 		{ 
 			if (pos != _localPosition) _hasChanged = true;

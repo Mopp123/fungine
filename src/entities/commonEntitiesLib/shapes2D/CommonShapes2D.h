@@ -9,8 +9,7 @@ namespace fungine
 	{
 		namespace commonEntityFactory
 		{
-			Entity* create_entity__Plane(const mml::Vector3& pos, const mml::Quaternion& rot, const mml::Vector3& scale, unsigned int instanceCount = 1);
-
+			Entity* create_entity__Plane2D(const mml::Vector2& pos, const mml::Vector2& scale, unsigned int instanceCount = 1);
 		}
 	}
 }

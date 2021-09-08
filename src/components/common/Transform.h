@@ -40,6 +40,8 @@ namespace fungine
 			mml::Vector3 up()		const;
 			mml::Vector3 forward()	const;
 
+			void setParent(Transform* p);
+
 			void setPosition(const mml::Vector3& pos);
 			void setRotation(const mml::Quaternion& rot);
 			void setScale(const mml::Vector3& scale);
@@ -53,17 +55,17 @@ namespace fungine
 			inline const mml::Quaternion&	getLocalRotation()	const { return _localRotation; }
 			inline const mml::Vector3&		getLocalScale()		const { return _localScale; }
 
-			inline void setParent(Transform* p) { _parent = p; }
-
+			
 			inline bool hasChanged() const { return _hasChanged; }
 
 			virtual const size_t getSize() const override;
 
-		private:
-
 			// Creates the final combined transformation matrix taking possible parent transform into account..
 			void createTransformationMatrix();
 
+		private:
+
+			
 			void extractFromTransformationMatrix_position(const mml::Matrix4& TM, mml::Vector3& out_pos)	const;
 			void extractFromTransformationMatrix_rotation(const mml::Matrix4& TM, mml::Quaternion& out_rot) const;
 			void extractFromTransformationMatrix_scale(const mml::Matrix4& TM, mml::Vector3& out_scale)		const;

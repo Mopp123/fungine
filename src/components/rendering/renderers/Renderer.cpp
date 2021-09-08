@@ -20,6 +20,7 @@ namespace fungine
 			{
 				buffer = buff;
 				bufferToTrack = buffToTrack;
+				update();
 			}
 			BatchInstanceData::~BatchInstanceData()
 			{}
@@ -47,6 +48,26 @@ namespace fungine
 			{
 				Debug::notify_on_destroy(_name + "(Renderer)");
 				s_allRenderers.erase(std::find(s_allRenderers.begin(), s_allRenderers.end(), this));
+			}
+
+			// Removes entity from render list of this renderer
+			// *This shouldn't be used too much especially continuously. Very slow operation!!!
+			void Renderer::removeFromRenderList(entities::Entity* e)
+			{
+				for (int i = 0; i < _entities.size(); i++)
+				{
+					Entity* entity = _entities[i];
+
+					std::vector<std::shared_ptr<BatchInstanceData>> batchInstanceDatas = entity->getComponents<BatchInstanceData>();
+					for (std::shared_ptr<BatchInstanceData> b : batchInstanceDatas)
+						if (b) entity->removeComponent(b);
+
+					if (e == entity)
+					{
+						_entities.erase(_entities.begin() + i);
+						_entitiesChanged = true;
+					}
+				}
 			}
 
 			void Renderer::onAttackToEntity(entities::Entity* entity)

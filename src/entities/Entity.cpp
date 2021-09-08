@@ -11,6 +11,7 @@
 #include "components/rendering/renderers/TerrainRenderer.h"
 #include "components/rendering/renderers/NatureRenderer.h"
 #include "components/guiComponents/GUIImage.h"
+#include "components/guiComponents/GUIText.h"
 
 
 namespace fungine
@@ -26,6 +27,7 @@ namespace fungine
 		{}
 		Entity::~Entity()
 		{
+			_components.clear();
 			Debug::notify_on_destroy("Entity");
 		}
 
@@ -34,6 +36,18 @@ namespace fungine
 			component->_entity = this;
 			component->onAttackToEntity(this);
 			add_to_dynamic_list(_components, component);
+		}
+		void Entity::removeComponent(std::shared_ptr<components::Component> component)
+		{
+			for (int i = 0; i < _components.size(); i++)
+			{
+				std::shared_ptr<Component>& c = _components[i];
+				if (c == component)
+				{
+					_components.erase(_components.begin() + i);
+					return;
+				}
+			}
 		}
 
 		// This is quite shit we have to do this for all possible components, if we want 
@@ -48,6 +62,7 @@ namespace fungine
 		template std::shared_ptr<TerrainRenderer>	Entity::getComponent<TerrainRenderer>();
 		template std::shared_ptr<NatureRenderer>	Entity::getComponent<NatureRenderer>();
 		template std::shared_ptr<GUIImage>			Entity::getComponent<GUIImage>();
+		template std::shared_ptr<GUIText>			Entity::getComponent<GUIText>();
 
 		template std::vector<std::shared_ptr<Transform>>		Entity::getComponents<Transform>();
 		template std::vector<std::shared_ptr<Mesh>>				Entity::getComponents<Mesh>();
@@ -59,6 +74,7 @@ namespace fungine
 		template std::vector<std::shared_ptr<TerrainRenderer>>	Entity::getComponents<TerrainRenderer>();
 		template std::vector<std::shared_ptr<NatureRenderer>>	Entity::getComponents<NatureRenderer>();
 		template std::vector<std::shared_ptr<GUIImage>>			Entity::getComponents<GUIImage>();
+		template std::vector<std::shared_ptr<GUIText>>			Entity::getComponents<GUIText>();
 
 
 		// Returns first component of type T

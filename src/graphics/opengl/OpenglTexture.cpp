@@ -74,7 +74,7 @@ namespace fungine
 					GL_FUNC(glTexImage2D(glTextureTarget, 0, glInternalFormat, width, height, 0, glFormat, glDataType, pixelData));
 
 					GL_FUNC(glTexParameteri(glTextureTarget, GL_TEXTURE_WRAP_S, glTexWrap_s));
-					GL_FUNC(glTexParameteri(glTextureTarget, GL_TEXTURE_WRAP_S, glTexWrap_t));
+					GL_FUNC(glTexParameteri(glTextureTarget, GL_TEXTURE_WRAP_T, glTexWrap_t));
 
 					GL_FUNC(glTexParameteri(glTextureTarget, GL_TEXTURE_MIN_FILTER, glTexFiltering_min));
 					GL_FUNC(glTexParameteri(glTextureTarget, GL_TEXTURE_MAG_FILTER, glTexFiltering_mag));

@@ -46,9 +46,7 @@ namespace fungine
 				Mesh* mesh = nullptr;
 				float** buffer;
 				float* bufferToTrack;
-
-				// This is true until second update (if we want to have some special stuff on first update)
-				bool init = true;
+				bool initialized = false;
 
 				BatchInstanceData(unsigned int position, unsigned int batchIndex, float** buff, float* buffToTrack, unsigned int buffElemLength);
 				~BatchInstanceData();
@@ -67,16 +65,19 @@ namespace fungine
 
 				
 				std::vector<entities::Entity*> _entities; // Entities this renderer has been attached to
-				bool _entitiesChanged = false; // True, if new entities added this renderer as component or an entity with this component gets destroyed
+				bool _entitiesChanged = true; // True, if new entities added this renderer as component or an entity with this component gets destroyed
 				
-				bool _batchCreated = false;
-
 				static std::vector<Renderer*> s_allRenderers;
 				static graphics::Framebuffer* s_framebuffer; // *->TEMP : just testing framebuffer here..
 
 			public:
 				Renderer(const std::string& name = RENDERER_DEFAULT_NAME);
 				virtual ~Renderer();
+
+				// Removes entity from render list of this renderer
+				// *This shouldn't be used too much especially continuously. Very slow operation!!!
+				void removeFromRenderList(entities::Entity* e);
+
 				
 				virtual void onAttackToEntity(entities::Entity* entity) override;
 				virtual void update() override;

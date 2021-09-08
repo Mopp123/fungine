@@ -8,6 +8,11 @@ namespace fungine
 {
 	namespace core
 	{
+
+		/// "Interface" between the engine and your application code
+		/// 
+		/// This is required to use functionality of the engine.
+		/// Creates window, rendering context, handles input, scenes etc.
 		class Program
 		{
 		private:
