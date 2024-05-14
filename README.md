@@ -4,6 +4,7 @@
 * GLEW
 * stb_image
 * Freetype
+* HarfBuzz (dependancy when building Freetype on unix)
 * Assimp
 
 ## Build
@@ -21,3 +22,12 @@ Install X11 and Wayland<br/>
 
 **GLEW**<br/>
 `sudo apt-get install build-essential libxmu-dev libxi-dev libgl-dev`
+
+**Freetype**<br/>
+`sudo apt install automake libtool autoconf`<br/>
+Built shared lib can be found from objs/.libs/
+
+**HarfBuzz**<br/>
+https://harfbuzz.github.io/building.html<br/>
+`sudo apt install libfreetype6-dev libglib2.0-dev libcairo2-dev meson pkg-config gtk-doc-tools`<br/>
+Also requires gcc and g++

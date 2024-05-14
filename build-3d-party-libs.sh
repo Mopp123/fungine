@@ -17,9 +17,29 @@ cd $root_dir
 cd glew/auto
 echo "Making glew(auto)..."
 make
-
 cd ..
 echo "Making glew..."
 make
 #make install
 #make clean
+
+
+# NOTE: BELOW NOT TESTED YET!
+
+# build freetype and harfbuzz
+# initial freetype..
+echo "Building freetype(without harfbuzz)"
+cd ../freetype
+./autogen.sh
+./configure --without-harfbuzz
+make
+# build harfbuzz
+echo "Building harfbuzz"
+cd ../harfbuzz
+meson build
+meson compile -C build
+# finalize building freetype
+cd ../freetype
+make distclean
+./configure
+make

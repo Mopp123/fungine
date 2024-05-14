@@ -4,3 +4,9 @@
 [submodule "glew"]
 	path = glew
 	url = git@github.com:nigels-com/glew.git
+[submodule "freetype"]
+	path = freetype
+	url = git@github.com:freetype/freetype.git
+[submodule "harfbuzz"]
+	path = harfbuzz
+	url = git@github.com:harfbuzz/harfbuzz.git
