@@ -1,7 +1,5 @@
-#pragma once
-
 #include "MeshVertexParsing.h"
-#include "core\Common.h"
+#include "core/Common.h"
 
 /*
 	*NOTE
@@ -88,7 +86,7 @@ namespace fungine
 			}
 
 
-			// Loads skinning data of the assimp mesh. 
+			// Loads skinning data of the assimp mesh.
 			// Also constructs the "bone mapping", and loads all bones, because
 			// why the fuck not, since we are looping through our bones..
 			/*void load_skinning_data(

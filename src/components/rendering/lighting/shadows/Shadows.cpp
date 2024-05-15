@@ -3,6 +3,7 @@
 #include "core/window/Window.h"
 #include "entities/Entity.h"
 #include "components/rendering/Camera.h"
+#include <cmath>
 #include <memory>
 
 namespace fungine
@@ -10,15 +11,15 @@ namespace fungine
 	using namespace core;
 	using namespace graphics;
 	using namespace entities;
-	
+
 	namespace components
 	{
 
-		ShadowCaster::ShadowCaster(const std::shared_ptr<Transform>& t) : 
+		ShadowCaster::ShadowCaster(const std::shared_ptr<Transform>& t) :
 			_transform(t)
 		{}
 
-		DirectionalShadowCaster::DirectionalShadowCaster(const std::shared_ptr<Transform>& t) : 
+		DirectionalShadowCaster::DirectionalShadowCaster(const std::shared_ptr<Transform>& t) :
 			ShadowCaster(t)
 		{}
 
@@ -56,7 +57,7 @@ namespace fungine
 					outMaxX = p.x;
 					outMaxY = p.y;
 					outMaxZ = p.z;
-					
+
 					first = false;
 					continue;
 				}
@@ -64,7 +65,7 @@ namespace fungine
 				outMinX = std::min(p.x, outMinX);
 				outMinY = std::min(p.y, outMinY);
 				outMinZ = std::max(p.z, outMinZ);
-				
+
 				outMaxX = std::max(p.x, outMaxX);
 				outMaxY = std::max(p.y, outMaxY);
 				outMaxZ = std::min(p.z, outMaxZ);
@@ -74,7 +75,7 @@ namespace fungine
 		void DirectionalShadowCaster::update()
 		{
 			Camera* camera = Camera::get_current_camera();
-			
+
 			// calc ortho proj matrix to take biggest possible shape on the camera's veiw frustum
 			mml::Vector4 points[4 + 4]; // 4 + 4 : nearplane + far plane vertices
 
@@ -90,7 +91,7 @@ namespace fungine
 			float farPlaneHeight = farPlaneWidth / aspectRatio;
 
 			// near plane:
-			
+
 			// top left
 			points[0] = mml::Vector4(-nearPlaneWidth, nearPlaneHeight, -zNear, 1.0f);
 			// topRight
@@ -146,7 +147,7 @@ namespace fungine
 			float height = (pMaxY - pMinY);
 			float length = (pMaxZ - pMinZ);
 
-			// * I have no idea why height has to be multiplied by 2, but if it wasnt multiplied by 2 we may sometimes get 
+			// * I have no idea why height has to be multiplied by 2, but if it wasnt multiplied by 2 we may sometimes get
 			// shadows looking way too wrong..
 			mml::create_orthographic_projection_matrix(_projectionMatrix, -width, width, height * 2, -height * 2, -length, length);
 

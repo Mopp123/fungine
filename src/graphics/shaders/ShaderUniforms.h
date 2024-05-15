@@ -1,6 +1,7 @@
 #pragma once
 
 #include "utils/myMathLib/MyMathLib.h"
+#include "ShaderProgram.h"
 #include <string>
 #include <vector>
 
@@ -13,9 +14,6 @@ namespace fungine
 
 	namespace graphics
 	{
-		enum class ShaderDataType;
-		
-
 		template<typename T>
 		struct ShaderUniform
 		{

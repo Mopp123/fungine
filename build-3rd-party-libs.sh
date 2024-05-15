@@ -13,7 +13,7 @@ cmake --build ./build/
 
 cd $root_dir
 
-# build glew
+# build GLEW
 cd glew/auto
 echo "Making glew(auto)..."
 make
@@ -26,20 +26,26 @@ make
 
 # NOTE: BELOW NOT TESTED YET!
 
-# build freetype and harfbuzz
-# initial freetype..
+# build Freetype and HarfBuzz
+# initial Freetype..
 echo "Building freetype(without harfbuzz)"
 cd ../freetype
 ./autogen.sh
 ./configure --without-harfbuzz
 make
-# build harfbuzz
+# build HarfBuzz
 echo "Building harfbuzz"
 cd ../harfbuzz
 meson build
 meson compile -C build
-# finalize building freetype
+# finalize building Freetype
 cd ../freetype
 make distclean
 ./configure
 make
+
+# Assimp
+echo "Building assimp"
+cd ../assimp
+cmake -S . -B ./build -D ASSIMP_INSTALL=OFF
+cmake --build ./build

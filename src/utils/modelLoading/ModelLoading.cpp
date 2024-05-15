@@ -1,17 +1,17 @@
 
 #include "ModelLoading.h"
 #include "graphics/Graphics.h"
-#include <assimp\scene.h>
-#include <assimp\Importer.hpp>
-#include <assimp\postprocess.h>
+#include <assimp/scene.h>
+#include <assimp/Importer.hpp>
+#include <assimp/postprocess.h>
 #include "graphics/RendererCommands.h"
 #include "components/rendering/Material.h"
 
 #include "MeshVertexParsing.h"
 //#include "MeshSkeletonParsing.h"
 
-#include "core\Debug.h"
-#include "core\Common.h"
+#include "core/Debug.h"
+#include "core/Common.h"
 
 /*
 	Limitations :
@@ -43,10 +43,10 @@ namespace fungine
 		{
 			// converts assimp mesh to our mesh type
 			static std::shared_ptr<Mesh> convert_assimp_mesh(
-				const aiScene* assimpScene, 
-				aiMesh* assimpMesh, 
-				unsigned int meshBaseIndex, 
-				bool loadTangents, 
+				const aiScene* assimpScene,
+				aiMesh* assimpMesh,
+				unsigned int meshBaseIndex,
+				bool loadTangents,
 				bool loadBones,
 				unsigned int instanceCount
 			)
@@ -76,15 +76,15 @@ namespace fungine
 				{
 					{ 0, ShaderDataType::Float3 }
 				});
-				
+
 				if (hasTexCoords)	vb_layout.add({ 1, ShaderDataType::Float2 });
 				if (hasNormals)		vb_layout.add({ 2, ShaderDataType::Float3 });
 				if (hasTangents)	vb_layout.add({ 3, ShaderDataType::Float3 });
 
 				// Create the fat "basic stuff" vertex buffer
 				VertexBuffer<float>* vertexBuffer = VertexBuffer<float>::create_vertex_buffer(
-					&vertexData[0], 
-					sizeof(float) * vertexData.size(), 
+					&vertexData[0],
+					sizeof(float) * vertexData.size(),
 					BufferUsage::StaticDraw, vb_layout
 				);
 				IndexBuffer* indexBuffer = IndexBuffer::create_index_buffer(indices);
@@ -204,7 +204,7 @@ namespace fungine
 
 				std::string imgName = get_file_name(pathToImg.C_Str());
 				std::string resourceName = imgName + nameExtension;
-				
+
 				std::string finalImagePath = MODEL_LOADING__RESOURCE_FOLDER__TEXTURE + std::string(pathToImg.C_Str());
 				ImageData* imgData = ImageData::load_image(finalImagePath);
 				if (!imgData)
@@ -228,7 +228,7 @@ namespace fungine
 			// Loads the material's textures specified by the aiMesh's material
 			// *NOTE Currently we can have only one diffuse, specular and normal texture (no possibility of texture blending at the moment..)
 			static void load_assimp_material(
-				const aiScene* assimpScene, 
+				const aiScene* assimpScene,
 				aiMesh* assimpMesh,
 
 				std::shared_ptr<Material>& outMaterial,
@@ -238,7 +238,7 @@ namespace fungine
 				Texture** normalTexture
 			)
 			{
-				
+
 				const unsigned int materialIndex = assimpMesh->mMaterialIndex;
 				aiMaterial* assimpMaterial = assimpScene->mMaterials[materialIndex];
 
@@ -249,7 +249,7 @@ namespace fungine
 				else
 					g_s_loaded_materials.push_back(materialName);
 
-				// *These are pairs, since we need a handle to the texture's image data created on the heap, 
+				// *These are pairs, since we need a handle to the texture's image data created on the heap,
 				// to be able to refer to it and destroy it later as well.
 				(*diffuseTexture) =	load_material_texture(assimpMaterial, aiTextureType_DIFFUSE);
 				(*specularTexture) = load_material_texture(assimpMaterial, aiTextureType_SPECULAR);
@@ -318,12 +318,12 @@ namespace fungine
 			}
 
 
-			// handles an assimp node (handles all child nodes as well 
+			// handles an assimp node (handles all child nodes as well
 			//	-> if this is called with root node as "assimpNode" handles every single assimp node we have in here..)
 			static void process_assimp_node(
-				const aiScene* assimpScene, 
+				const aiScene* assimpScene,
 				aiNode* assimpNode,
-				bool loadTangents, 
+				bool loadTangents,
 				bool loadMaterial,
 
 				unsigned int instanceCount,
@@ -335,8 +335,11 @@ namespace fungine
 			{
 				for (int i = 0; i < assimpNode->mNumMeshes; i++)
 				{
+                                        // NOTE! How the fuck has this ever worked?????
+                                        Debug::log("___TEST___ERROR TEST!!!");
 					aiMesh* assimpMesh = assimpScene->mMeshes[assimpNode->mMeshes[i]];
-					
+                                        Debug::log("___TEST___ERROR TEST -> SUCCESS!");
+
 					std::shared_ptr<Material> material = nullptr;
 
 					if (loadMaterial)
@@ -389,7 +392,7 @@ namespace fungine
 				std::vector<Texture*>& outTextures,
 				std::vector<std::shared_ptr<components::Material>>& outMaterials,
 
-				unsigned int postProcessFlags, 
+				unsigned int postProcessFlags,
 				bool loadMaterialData,
 				unsigned int instanceCount
 			)
@@ -425,14 +428,14 @@ namespace fungine
 
 				bool loadTangents = assimpPostProcessFlags & aiPostProcessSteps::aiProcess_CalcTangentSpace;
 				process_assimp_node(
-					assimpScene, 
-					assimpScene->mRootNode, 
+					assimpScene,
+					assimpScene->mRootNode,
 					loadTangents,
-					
+
 					loadMaterialData,
 					instanceCount,
 
-					outMeshes, 
+					outMeshes,
 					outTextures,
 					outMaterials
 				);

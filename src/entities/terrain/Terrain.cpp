@@ -1,6 +1,7 @@
 
 #include "Terrain.h"
 #include "graphics/Graphics.h"
+#include <cmath>
 
 namespace fungine
 {
@@ -80,7 +81,7 @@ namespace fungine
 					float vertexPos_z = z * _tileWidth;
 					positions.push_back({ vertexPos_x, height, vertexPos_z });
 					uvs.push_back({vertexPos_x / (_verticesPerRow * _tileWidth), vertexPos_z / (_verticesPerRow * _tileWidth)});
-					
+
 					// Calc normal
 					float left = 0;
 					float right = 0;
@@ -102,7 +103,7 @@ namespace fungine
 					if (heightmapY - 1 >= 0)
 						down = _heightmap[heightmapX + (heightmapY - 1) * _verticesPerRow];
 
-					
+
 					mml::Vector3 normal((left - right), _heightModifier * 0.1f, (down - up)); // this is fucking dumb...
 					normal.normalize();
 					normals.push_back(normal);
@@ -172,11 +173,11 @@ namespace fungine
 					indices.push_back(bottomLeft);
 					indices.push_back(topLeft);
 					indices.push_back(topRight);
-				
+
 					indices.push_back(topRight);
 					indices.push_back(bottomRight);
 					indices.push_back(bottomLeft);
-					
+
 				}
 			}
 

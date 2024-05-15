@@ -4,13 +4,20 @@
 
 namespace mml
 {
-	Vector2::Vector2(float X, float Y) : 
+	Vector2::Vector2(float X, float Y) :
 		x(X), y(Y)
 	{}
 
 	float Vector2::magnitude() const
 	{
-		return std::sqrtf((x * x) + (y * y));
+            // Quick fix to get running on linux..
+            #ifdef _WIN32
+            return std::sqrtf((x * x) + (y * y));
+            #elif __linux__
+            return sqrtf((x * x) + (y * y));
+            #else
+            // error...
+            #endif
 	}
 
 	void Vector2::normalize()

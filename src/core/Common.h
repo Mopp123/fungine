@@ -3,7 +3,9 @@
 #include "utils/myMathLib/MyMathLib.h"
 
 // Definitions ----------------------------------	Definitions
-#define byte unsigned char
+// Below stoppend working on ubuntu, so switching to typedef
+//#define byte unsigned char
+typedef unsigned char byte;
 
 // Defaults -------------------------------------	Defaults
 #define DEFAULT__WINDOW_WIDTH 1024

@@ -10,3 +10,6 @@
 [submodule "harfbuzz"]
 	path = harfbuzz
 	url = git@github.com:harfbuzz/harfbuzz.git
+[submodule "assimp"]
+	path = assimp
+	url = git@github.com:assimp/assimp.git

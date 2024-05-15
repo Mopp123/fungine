@@ -15,6 +15,7 @@ rm -rf build
 
 # GLEW
 cd ../glew/auto
+echo "Cleaning glew dir: $(pwd)"
 make clean && make destroy
 cd ..
 # NOTE: This is not required if using the "build script provided"
@@ -22,10 +23,16 @@ cd ..
 make uninstall && make clean && make distclean
 
 # Freetype
+echo "Cleaning freetype dir: $(pwd)"
 cd ../freetype
 make distclean
 
 # HarfBuzz
+echo "Cleaning harfbuzz dir: $(pwd)"
 cd ../harfbuzz
 rm -rf build
 
+# Assimp
+echo "Cleaning assimp dir: $(pwd)"
+cd ../assimp
+rm -rf build

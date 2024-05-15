@@ -10,7 +10,14 @@ namespace mml
 
 	float Vector4::magnitude() const
 	{
-		return std::sqrtf((x * x) + (y * y) + (z * z) + (w * w));
+            // Quick fix to get running on linux..
+            #ifdef _WIN32
+	    return std::sqrtf((x * x) + (y * y) + (z * z) + (w * w));
+            #elif __linux__
+	    return sqrtf((x * x) + (y * y) + (z * z) + (w * w));
+            #else
+            // error...
+            #endif
 	}
 
 	void Vector4::normalize()

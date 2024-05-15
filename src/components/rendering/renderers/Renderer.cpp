@@ -4,6 +4,7 @@
 #include "utils/Time.h"
 #include "components/rendering/Camera.h"
 #include "core/Debug.h"
+#include <algorithm>
 
 namespace fungine
 {
@@ -14,7 +15,7 @@ namespace fungine
 	{
 		namespace rendering
 		{
-			
+
 			BatchInstanceData::BatchInstanceData(unsigned int position, unsigned int batchIndex, float** buff, float* buffToTrack, unsigned int buffElemLength) :
 				Component("EntityBatchData", true), position(position), batchIndex(batchIndex), buffElemLength(buffElemLength)
 			{

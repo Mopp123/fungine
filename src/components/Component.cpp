@@ -1,6 +1,7 @@
 
 #include "Component.h"
 #include "entities/Entity.h"
+#include <algorithm>
 
 namespace fungine
 {

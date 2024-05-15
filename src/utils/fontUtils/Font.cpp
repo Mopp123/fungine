@@ -1,6 +1,8 @@
 
 #include "Font.h"
 #include "core/Debug.h"
+#include <cmath>
+#include <vector>
 
 namespace fungine
 {

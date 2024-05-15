@@ -1,7 +1,8 @@
 #pragma once
 
 #include "utils/myMathLib/MyMathLib.h"
-#include "ShaderUniforms.h"
+// wtf?
+//#include "ShaderUniforms.h"
 #include <string>
 #include <vector>
 #include <unordered_map>
@@ -78,7 +79,7 @@ namespace fungine
 			virtual void setUniform(int location, const mml::Vector2& vec) const = 0;
 			virtual void setUniform(int location, const mml::Vector3& vec) const = 0;
 			virtual void setUniform(int location, const mml::Vector4& vec) const = 0;
-			
+
 			virtual void setUniform(int location, const mml::Matrix4& m) const = 0;
 
 
@@ -91,7 +92,7 @@ namespace fungine
 			virtual void setUniform(const std::string& location, const mml::Vector2& vec) = 0;
 			virtual void setUniform(const std::string& location, const mml::Vector3& vec) = 0;
 			virtual void setUniform(const std::string& location, const mml::Vector4& vec) = 0;
-			
+
 			virtual void setUniform(const std::string& location, const mml::Matrix4& m) = 0;
 
 
@@ -100,7 +101,7 @@ namespace fungine
 
 			inline const unsigned int getID() const { return _id; }
 			inline const std::string& getName() const { return _name; }
-			
+
 			inline std::vector<std::pair<std::string, ModifyableUniform>>& getModifyableUniforms() { return _modifyableUniforms; }
 		};
 	}
