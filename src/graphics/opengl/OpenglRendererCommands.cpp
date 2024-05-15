@@ -1,5 +1,5 @@
 
-#include <GLEW/glew.h>
+#include <GL/glew.h>
 #include "core/window/Window.h"
 #include "core/Program.h"
 #include "OpenglRendererCommands.h"
@@ -127,8 +127,8 @@ namespace fungine
 				GL_FUNC(glDrawElementsInstanced(openglDrawType, mesh->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, NULL, instanceCount));
 			}
 
-			
-			
+
+
 			template<typename T>
 			static void upload_uniform(ShaderProgram* shader, const std::vector<ShaderUniform<T>>& uniforms)
 			{

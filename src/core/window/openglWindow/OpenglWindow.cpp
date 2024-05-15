@@ -1,5 +1,5 @@
 
-#include <GLEW/glew.h>
+#include <GL/glew.h>
 #include "OpenglWindow.h"
 #include "core/Common.h"
 #include "core/Debug.h"
@@ -68,7 +68,7 @@ namespace fungine
 				return;
 			}
 
-			
+
 			// Tie our event system with this glfw window thing..
 			glfwSetKeyCallback(_glfwWindowHandle, glfw_key_callback);
 			glfwSetMouseButtonCallback(_glfwWindowHandle, glfw_mouse_button_callback);
@@ -151,7 +151,7 @@ namespace fungine
 			keyMapping[GLFW_KEY_SPACE] =		FUNGINE_KEY_SPACE;
 			keyMapping[GLFW_KEY_ENTER] =		FUNGINE_KEY_ENTER;
 			keyMapping[GLFW_KEY_ESCAPE] =		FUNGINE_KEY_ESCAPE;
-		
+
 			keyMapping[GLFW_KEY_LEFT] =		FUNGINE_KEY_LEFT;
 			keyMapping[GLFW_KEY_RIGHT] =	FUNGINE_KEY_RIGHT;
 			keyMapping[GLFW_KEY_UP] =		FUNGINE_KEY_UP;

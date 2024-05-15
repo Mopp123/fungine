@@ -1,5 +1,5 @@
 
-#include <GLEW/glew.h>
+#include <GL/glew.h>
 #include "OpenglRendererCommands.h"
 #include "OpenglTexture.h"
 #include "core/Debug.h"
@@ -22,7 +22,7 @@ namespace fungine
 			) :
 				Texture(imgData)
 			{
-				
+
 
 				// *allow creating opengl texture without any pixel data as well
 				byte* pixelData = nullptr;

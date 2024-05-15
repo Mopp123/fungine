@@ -1,5 +1,5 @@
 
-#include <GLEW/glew.h>
+#include <GL/glew.h>
 #include "OpenglShaderProgram.h"
 #include "core/Debug.h"
 #include "core/Common.h"
@@ -72,7 +72,7 @@ namespace fungine
 				// Find all uniforms from the shaders' source codes..
 				std::vector<std::pair<std::string, ModifyableUniform>> uniforms_vertexShader = _vertexShader->findModifyableUniforms();
 				std::vector<std::pair<std::string, ModifyableUniform>> uniforms_fragmentShader = _fragmentShader->findModifyableUniforms();
-				
+
 				_modifyableUniforms.reserve(uniforms_vertexShader.size() + uniforms_fragmentShader.size());
 				_modifyableUniforms.insert(_modifyableUniforms.end(), uniforms_vertexShader.begin(), uniforms_vertexShader.end());
 				_modifyableUniforms.insert(_modifyableUniforms.end(), uniforms_fragmentShader.begin(), uniforms_fragmentShader.end());
@@ -119,7 +119,7 @@ namespace fungine
 					return uniformLocation;
 				}
 			}
-			
+
 			bool OpenglShaderProgram::hasUniformLocation(const std::string& name) const
 			{
 				// If this uniform name is already in cache -> return its' location
@@ -127,11 +127,11 @@ namespace fungine
 				{
 					return true;
 				}
-				
+
 				int uniformLocation = GL_FUNC(glGetUniformLocation(_id, name.c_str()));
 				if (uniformLocation != -1)
 					return true;
-				
+
 				return false;
 			}
 

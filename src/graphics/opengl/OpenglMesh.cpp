@@ -1,5 +1,5 @@
 
-#include <GLEW/glew.h>
+#include <GL/glew.h>
 #include "OpenglMesh.h"
 #include "graphics/Buffers.h"
 #include "OpenglBuffers.h"
@@ -19,7 +19,7 @@ namespace fungine
 				GL_FUNC(glGenVertexArrays(1, &_vaoID));
 
 				GL_FUNC(glBindVertexArray(_vaoID));
-				
+
 				if (_indexBuffer != nullptr)
 				{
 					GL_FUNC(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBuffer->getID()));

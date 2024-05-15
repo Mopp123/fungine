@@ -1,5 +1,5 @@
 
-#include <GLEW/glew.h>
+#include <GL/glew.h>
 #include "OpenglShaderStage.h"
 #include "core/Common.h"
 #include "core/Debug.h"
@@ -28,11 +28,11 @@ namespace fungine
 				if (uniformDataType == "vec2")		return ShaderDataType::Float2;
 				if (uniformDataType == "vec3")		return ShaderDataType::Float3;
 				if (uniformDataType == "vec4")		return ShaderDataType::Float4;
-				
+
 				if (uniformDataType == "int")		return ShaderDataType::Int;
 
 				if (uniformDataType == "mat4")		return ShaderDataType::Matrix4;
-				
+
 				if (uniformDataType == "sampler2D") return ShaderDataType::Texture2D;
 
 				return ShaderDataType::None;
@@ -61,7 +61,7 @@ namespace fungine
 					}
 
 					s.erase(s.begin(), s.begin() + index);
-					
+
 					size_t uPos = line.find("uniform ");
 					if (uPos != std::string::npos)
 					{

@@ -1,5 +1,5 @@
 
-#include <GLEW/glew.h>
+#include <GL/glew.h>
 #include "OpenglBuffers.h"
 #include "graphics/Buffers.h"
 #include "core/Debug.h"
@@ -47,8 +47,8 @@ namespace fungine
 			OpenglIndexBuffer::OpenglIndexBuffer(const std::vector<unsigned int>& data) :
 				IndexBuffer(data)
 			{
-				// * We have "GL_ARRAY_BUFFER" and NOT "GL_ELEMENT_ARRAY_BUFFER" here on purpose, since 
-				// "GL_ELEMENT_ARRAY_BUFFER" isn't "valid" if theres no vao bound at the moment, but this 
+				// * We have "GL_ARRAY_BUFFER" and NOT "GL_ELEMENT_ARRAY_BUFFER" here on purpose, since
+				// "GL_ELEMENT_ARRAY_BUFFER" isn't "valid" if theres no vao bound at the moment, but this
 				// way we can bind data to buffer thats about to be bound as "GL_ELEMENT_ARRAY_BUFFER"
 				GL_FUNC(glGenBuffers(1, &_id));
 				GL_FUNC(glBindBuffer(GL_ARRAY_BUFFER, _id));

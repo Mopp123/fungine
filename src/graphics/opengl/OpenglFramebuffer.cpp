@@ -1,5 +1,5 @@
 
-#include <GLEW/glew.h>
+#include <GL/glew.h>
 #include "OpenglFramebuffer.h"
 #include "OpenglRendererCommands.h"
 #include "core/Debug.h"
@@ -135,7 +135,7 @@ namespace fungine
 
 				GL_FUNC(glBindFramebuffer(GL_FRAMEBUFFER, _id));
 				GL_FUNC(glBindTexture(glTextureTarget, depthTexture->getID())); // *Not sure is this required here
-				
+
 				GL_FUNC(glFramebufferTexture2D(GL_FRAMEBUFFER, glAttachment, glTextureTarget, depthTexture->getID(), 0));
 
 				// finalize..
