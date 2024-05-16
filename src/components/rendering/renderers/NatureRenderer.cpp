@@ -48,7 +48,7 @@ namespace fungine
 			{
 				std::shared_ptr<Mesh> mesh = entity->getComponent<Mesh>();
 				std::shared_ptr<BatchInstanceData> entityBatchData = entity->getComponent<BatchInstanceData>();
-				
+
 				// If this entity haven't been added to a batch yet?
 				//	-> Attempt to find a suitable batch for it
 				if (!entityBatchData)
@@ -126,7 +126,7 @@ namespace fungine
 					Material* material = batch.second->material.get();
 					Mesh* mesh = batch.second->mesh.get();
 					ShaderProgram* shader = material->getShader();
-					
+
 					// which face we want to cull?
 					material->isTwoSided() ? rendererCommands->cullFace(CullFace::None) : rendererCommands->cullFace(CullFace::Back);
 
@@ -137,7 +137,7 @@ namespace fungine
 					// Common uniforms
 					shader->setUniform("projectionMatrix", projectionMatrix);
 					shader->setUniform("viewMatrix", viewMatrix);
-					
+
 					shader->setUniform("directionalLight_direction", directionalLight->getDirection());
 
 					if(shader->hasUniformLocation("cameraPos"))
@@ -157,13 +157,13 @@ namespace fungine
 					// *->TEMP
 					shader->setUniform("texture_shadowmap", 4);
 					rendererCommands->bindTexture(shadowCaster.getShadowmapTexture(), 4);
-					
+
 					// Finally drawing..
 					rendererCommands->bindMesh(mesh);
 
 					const unsigned int instanceCount = batch.second->instanceCount; //mesh->getInstanceCount();
 
-					
+
 					// Transformation matrices
 					if (!batch.second->transformationsBuffUpdated)
 					{
@@ -175,7 +175,7 @@ namespace fungine
 					{
 						batch.second->transformationsBuffUpdated = false;
 					}
-					
+
 					// Update the wind instanced data only once
 					if (!batch.second->instancedDataHandled)
 					{
@@ -208,7 +208,7 @@ namespace fungine
 			{
 				const RendererCommands* rendererCommands = Graphics::get_renderer_commands();
 				const ShadowCaster& shadowCaster = DirectionalLight::get_directional_light()->getShadowCaster();
-				
+
 				for (std::pair<std::shared_ptr<Mesh>, std::shared_ptr<BatchData_NatureRendering>>& batch : _batches)
 				{
 #ifdef DEBUG__MODE_FULL
@@ -229,7 +229,7 @@ namespace fungine
 						continue;
 
 					rendererCommands->bindShader(shader);
-					
+
 					// Common uniforms
 					shader->setUniform("projectionMatrix", shadowCaster.getProjectionMatrix());
 					shader->setUniform("viewMatrix", shadowCaster.getViewMatrix());
@@ -238,7 +238,7 @@ namespace fungine
 					ShaderUniform<float>* uniform_windMultiplier = material->getShaderUniform_Float("m_windMultiplier");
 					if(uniform_windMultiplier)
 						shader->setUniform("m_windMultiplier", uniform_windMultiplier->data);
-					
+
 					shader->setUniform("time", (float)Time::get_time());
 
 					// Drawing..
@@ -260,7 +260,7 @@ namespace fungine
 
 					// Update the wind instanced data only once
 					if (!batch.second->instancedDataHandled)
-					{	
+					{
 						// Wind properties
 						VertexBuffer<float>* instancedWindBuffer = mesh->getVertexBuffers()[2];
 						size_t windPropertyBuffSize = sizeof(float) * instanceCount;
@@ -284,7 +284,7 @@ namespace fungine
 				//_batches.clear();
 			}
 
-			std::shared_ptr<BatchData_NatureRendering>& NatureRenderer::createNewBatch(std::shared_ptr<Material>& material, std::shared_ptr<Mesh>& mesh)
+			std::shared_ptr<BatchData_NatureRendering> NatureRenderer::createNewBatch(std::shared_ptr<Material>& material, std::shared_ptr<Mesh>& mesh)
 			{
 				printf("Creating new batch!\n");
 
@@ -300,9 +300,9 @@ namespace fungine
 					{ 7, ShaderDataType::Float4, true }
 				});
 				VertexBuffer<float>* perInstanceTransformationsBuffer = VertexBuffer<float>::create_vertex_buffer(
-					newBatch->transformations, 
-					sizeof(float) * transformationsBuffLength, 
-					BufferUsage::StreamDraw, 
+					newBatch->transformations,
+					sizeof(float) * transformationsBuffLength,
+					BufferUsage::StreamDraw,
 					transformationsBuffLayout
 				);
 
@@ -313,16 +313,16 @@ namespace fungine
 				});
 
 				VertexBuffer<float>* perInstanceWindBuffer = VertexBuffer<float>::create_vertex_buffer(
-					newBatch->windProperties, 
+					newBatch->windProperties,
 					sizeof(float) * windPropertiesBuffLength,
-					BufferUsage::StaticDraw, 
+					BufferUsage::StaticDraw,
 					windBufferLayout
 				);
 
-				// *When adding vertex buffer to a mesh, we need to have the mesh bound, 
-				//	..quite fucking stupid and annoying "mesh binding system thing.. 
+				// *When adding vertex buffer to a mesh, we need to have the mesh bound,
+				//	..quite fucking stupid and annoying "mesh binding system thing..
 				//	*->TODO: Do something about mesh binding shit thing
-				RendererCommands* rc = Graphics::get_renderer_commands(); 
+				RendererCommands* rc = Graphics::get_renderer_commands();
 				rc->bindMesh(newBatch->mesh.get());
 				newBatch->mesh->addVertexBuffer(perInstanceTransformationsBuffer);
 				newBatch->mesh->addVertexBuffer(perInstanceWindBuffer);
@@ -346,7 +346,7 @@ namespace fungine
 					16
 				);
 				entity->addComponent(entityBatchData);
-				
+
 				transform->update();
 				addToTransformsBuff(batch, transform->getTransformationMatrix());
 				addToWindInitValsBuff(batch);
@@ -361,7 +361,7 @@ namespace fungine
 				{
 					for (int i = 0; i < 16; ++i)
 						batch.transformations[ptr + i] = transformationMatrix[i];
-					
+
 					ptr += 16;
 				}
 			}

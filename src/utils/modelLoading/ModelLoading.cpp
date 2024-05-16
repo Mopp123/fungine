@@ -335,10 +335,7 @@ namespace fungine
 			{
 				for (int i = 0; i < assimpNode->mNumMeshes; i++)
 				{
-                                        // NOTE! How the fuck has this ever worked?????
-                                        Debug::log("___TEST___ERROR TEST!!!");
 					aiMesh* assimpMesh = assimpScene->mMeshes[assimpNode->mMeshes[i]];
-                                        Debug::log("___TEST___ERROR TEST -> SUCCESS!");
 
 					std::shared_ptr<Material> material = nullptr;
 

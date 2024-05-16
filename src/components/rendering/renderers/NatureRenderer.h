@@ -21,7 +21,7 @@ namespace fungine
 				unsigned int staticArrDataPtr_transformations = 0;
 
 				float* windProperties = nullptr;
-				unsigned int staticArrDataPtr_wind = 0;				
+				unsigned int staticArrDataPtr_wind = 0;
 
 				unsigned int instanceCount = 0;
 				bool instancedDataHandled = false;
@@ -71,9 +71,9 @@ namespace fungine
 
 			private:
 
-				std::shared_ptr<BatchData_NatureRendering>& createNewBatch(std::shared_ptr<Material>& material, std::shared_ptr<Mesh>& mesh);
+				std::shared_ptr<BatchData_NatureRendering> createNewBatch(std::shared_ptr<Material>& material, std::shared_ptr<Mesh>& mesh);
 				void addToBatch(entities::Entity* entity, BatchData_NatureRendering& batch);
-			
+
 				void addToTransformsBuff(BatchData_NatureRendering& batch, const mml::Matrix4& transformationMatrix);
 				void addToWindInitValsBuff(BatchData_NatureRendering& batch);
 			};

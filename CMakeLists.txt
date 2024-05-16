@@ -7,7 +7,7 @@ set(TARGET_NAME "fungine-engine")
 project(${PROJ_NAME})
 
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -std=c++17 -DGLEW_NO_GLU")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++17 -DGLEW_NO_GLU")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++17 -DGLEW_NO_GLU -Ofast --loop_optimization_level=2")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # TODO: Have single "combined header file" instead of including the whole shit..
