@@ -10,7 +10,6 @@ cd $root_dir
 
 #target_dir=$root_dir/TEST
 target_dir=$root_dir
-echo "___TEST___target = $target_dir"
 
 # GLFW
 cp -r glfw/include/* $target_dir/include/
