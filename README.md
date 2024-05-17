@@ -8,7 +8,19 @@
 * Assimp
 
 ## Build
-To build all the used libraries some additional dependancies may need installing.
+To build all the submodules some additional dependancies may need installing.
+
+Unix
+To install all required packages
+`make install-lib-dependancies`
+
+To build as shared library
+`make` or `make all`
+This does not install the required packages in case you don't want to do that..
+
+To build the engine only without building submodules
+`make build`
+
 
 **NOTE: MIGHT BE IMPORTANT ON SOME SETUPS!**<br/>
 To build GLEW you may need to alter glew/auto/Makefile line 13

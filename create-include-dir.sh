@@ -1,9 +1,11 @@
 #!/bin/bash
 
-# Combines all required header files from subdirectories
+# Creates include dir containing only src's header files and creates
+# combined header file which can be used to include the whole engine
+# into projects using this..
 
-out_dir="include-TEST"
-out_file="Test.hpp"
+out_dir="include"
+out_file="Fungine.hpp"
 
 
 # Get script's dir
@@ -31,7 +33,6 @@ root_dir=$(pwd)
 find $root_dir -type f -print0 | while read -d $'\0' file; do
     if [[ $file == *.cpp ]]
     then
-        echo "Deleting cpp file: $file"
         rm $file
     fi
 done
