@@ -1,4 +1,3 @@
-
 SHELL = /bin/bash
 build_dir := ./build
 shared_build_name := libfungine-engine.so
