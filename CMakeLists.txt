@@ -10,10 +10,15 @@ project(${PROJ_NAME})
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++17 -DGLEW_NO_GLU -Ofast")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-# TODO: Have single "combined header file" instead of including the whole shit..
-include_directories("./src" "./include")
+include_directories(
+    "./src"
+    "./glfw/include"
+    "./glew/include"
+    "./freetype/include"
+    "./assimp/include"
+    "./assimp/build/include"
+)
 
-# NOTE: This may fuck up due to things being in wrong order!
 file(
     GLOB SOURCE_FILES
     "${PROJECT_SOURCE_DIR}/src/core/*.cpp"
@@ -52,10 +57,11 @@ file(
 
 find_package(OpenGL REQUIRED)
 
-#add_executable(test ${SOURCE_FILES})
 add_library(${TARGET_NAME} SHARED ${SOURCE_FILES})
-target_link_libraries(${TARGET_NAME} "${PROJECT_SOURCE_DIR}/lib/libglfw.so.3")
-target_link_libraries(${TARGET_NAME} "${PROJECT_SOURCE_DIR}/lib/libGLEW.so.2.2")
-target_link_libraries(${TARGET_NAME} "${PROJECT_SOURCE_DIR}/lib/libfreetype.so.6.20.1")
-target_link_libraries(${TARGET_NAME} "${PROJECT_SOURCE_DIR}/lib/libassimp.so.5")
+
+target_link_libraries(${TARGET_NAME} "${PROJECT_SOURCE_DIR}/glfw/build/src/libglfw.so.3")
+target_link_libraries(${TARGET_NAME} "${PROJECT_SOURCE_DIR}/glew/lib/libGLEW.so.2.2")
+target_link_libraries(${TARGET_NAME} "${PROJECT_SOURCE_DIR}/freetype/objs/.libs/libfreetype.so.6.20.1")
+target_link_libraries(${TARGET_NAME} "${PROJECT_SOURCE_DIR}/assimp/build/bin/libassimp.so.5")
+
 target_link_libraries(${TARGET_NAME} ${OPENGL_LIBRARIES})

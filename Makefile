@@ -3,7 +3,7 @@ build_dir := ./build
 shared_build_name := libfungine-engine.so
 
 
-all: build-libs create-include-dir copy-lib-includes build create-lib-dir
+all: build-libs create-include-dir build
 
 
 install-lib-dependancies:
@@ -12,15 +12,15 @@ install-lib-dependancies:
 build-libs:
 	./build-3rd-party-libs.sh
 
-build: $(wildcard ./src/*)
+build: $(wildcard ./src/*) CMakeLists.txt
 	cmake -S . -B $(build_dir)
 	cmake --build $(build_dir)
 
 create-include-dir:
 	./create-include-dir.sh
 
-copy-lib-includes:
-	./copy-3rd-party-includes.sh
+#copy-lib-includes:
+#	./copy-3rd-party-includes.sh
 
 create-lib-dir:
 	# if already exists -> delete it
