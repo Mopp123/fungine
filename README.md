@@ -1,4 +1,5 @@
 
+
 ## Dependancies
 * GLFW
 * GLEW
@@ -7,19 +8,23 @@
 * HarfBuzz (dependancy when building Freetype on unix)
 * Assimp
 
+
 ## Build
 To build all the submodules some additional dependancies may need installing.
 
-Unix
+###Unix
 To install all required packages
-`make install-lib-dependancies`
+```
+make install-lib-dependancies
+```
 
 To build as shared library
 `make` or `make all`
 This does not install the required packages in case you don't want to do that..
 
-To build the engine only without building submodules
+To build the engine only without building submodules.
 `make build`
+This requires all the submodules to be already built though.
 
 
 **NOTE: MIGHT BE IMPORTANT ON SOME SETUPS!**<br/>
