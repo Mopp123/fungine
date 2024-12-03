@@ -11,7 +11,7 @@ some fixes some places have been changed to use spaces(4) as tabs instead.
 ## Build
 To build all the submodules some additional dependancies may need installing.
 
-### Unix
+### Linux
 To install all required packages
 `sudo make install-lib-dependancies`
 
