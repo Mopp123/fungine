@@ -27,3 +27,6 @@ This requires all the submodules to be already built though.
 These creates `build` directory containing the build as shared library.
 
 To clean up build and submodules' builds run `make clean`
+
+NOTE! GLEW has file auto/Makefile which has defined PYTHON ?= python.
+You probably need to change it to python3 instead for you to be able to install it with our Makefile!
